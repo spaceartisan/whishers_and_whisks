@@ -56,6 +56,8 @@
               <div class="whisker w1"></div><div class="whisker w2"></div><div class="whisker w3"></div><div class="whisker w4"></div>
             </div>
           </div>
+          <div class="counter-paw cat-paw left" aria-hidden="true"></div>
+          <div class="counter-paw cat-paw right" aria-hidden="true"></div>
           <div class="pastry-display" id="pastry-display">🍪</div>
           <button class="primary-btn" id="bake-btn">Bake something</button>
         </div>
@@ -64,6 +66,9 @@
       <nav class="bottom-nav" aria-label="Game navigation">
         <button class="nav-btn active" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
         <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
+        <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
+        <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
         <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
@@ -83,6 +88,8 @@
       <div id="ingredient-stage" class="stage">
         <div class="section-title"><h3>Add the ingredients</h3><p>Tap each one into the bowl.</p></div>
         <div class="bowl-zone">
+          <div class="stage-paw cat-paw ingredient-paw left" aria-hidden="true"></div>
+          <div class="stage-paw cat-paw ingredient-paw right" aria-hidden="true"></div>
           <div class="bowl" id="ingredient-bowl"><div class="bowl-fill"></div></div>
           <div class="ingredient-pop" id="ingredient-pop"></div>
         </div>
@@ -92,9 +99,35 @@
       <div id="mix-stage" class="stage">
         <div class="section-title"><h3>Mix it gently</h3><p>Swirl your finger around the bowl.</p></div>
         <div class="mix-zone" id="mix-zone">
+          <div class="stage-paw cat-paw mix-paw left" aria-hidden="true"></div>
+          <div class="stage-paw cat-paw mix-paw right" aria-hidden="true"></div>
           <div class="mix-bowl"><div class="mix-batter" id="mix-batter"></div><div class="spoon" id="spoon"></div></div>
         </div>
         <div class="progress-shell"><div class="progress-fill" id="mix-progress"></div></div>
+      </div>
+
+      <div id="knead-stage" class="stage">
+        <div class="section-title"><h3>Knead the dough</h3><p>Tap the dough and let those little paws work.</p></div>
+        <button class="dough-zone" id="knead-zone" aria-label="Knead the dough">
+          <div class="knead-board"></div>
+          <div class="knead-dough" id="knead-dough"></div>
+          <div class="cat-paw knead-paw left" aria-hidden="true"></div>
+          <div class="cat-paw knead-paw right" aria-hidden="true"></div>
+          <div class="knead-marks" id="knead-marks"></div>
+        </button>
+        <div class="tap-hint" id="knead-hint">tap tap tap</div>
+        <div class="progress-shell"><div class="progress-fill" id="knead-progress"></div></div>
+      </div>
+
+      <div id="press-stage" class="stage">
+        <div class="section-title"><h3>Press the crust</h3><p>Tap around the dough to make a cozy little pie shell.</p></div>
+        <button class="press-zone" id="press-zone" aria-label="Press the pie crust">
+          <div class="pie-dough" id="pie-dough"></div>
+          <div class="cat-paw press-paw" aria-hidden="true"></div>
+          <div class="press-marks" id="press-marks"></div>
+        </button>
+        <div class="tap-hint">soft little paw presses</div>
+        <div class="progress-shell"><div class="progress-fill" id="press-progress"></div></div>
       </div>
 
       <div id="oven-stage" class="stage">
@@ -103,13 +136,21 @@
           <div class="oven-top"><span></span><span></span><span></span></div>
           <div class="oven-window"><div id="oven-pastry">🍪</div></div>
         </div>
-        <button class="hold-btn" id="oven-hold">Hold to bake</button>
+        <div class="oven-control">
+          <div class="cat-paw oven-paw left" aria-hidden="true"></div>
+          <button class="hold-btn" id="oven-hold">Hold to bake</button>
+          <div class="cat-paw oven-paw right" aria-hidden="true"></div>
+        </div>
         <div class="progress-shell"><div class="progress-fill warm" id="oven-progress"></div></div>
       </div>
 
       <div id="decorate-stage" class="stage">
         <div class="section-title"><h3>Make it yours</h3><p>Decorate as much or as little as you like.</p></div>
-        <div class="plate"><div class="big-pastry" id="decor-pastry">🧁</div><div class="decorations" id="decorations"></div></div>
+        <div class="plate-wrap">
+          <div class="cat-paw decor-paw left" aria-hidden="true"></div>
+          <div class="plate"><div class="big-pastry" id="decor-pastry">🧁</div><div class="decorations" id="decorations"></div></div>
+          <div class="cat-paw decor-paw right" aria-hidden="true"></div>
+        </div>
         <div class="topping-grid" id="topping-grid"></div>
         <button class="primary-btn wide" id="serve-btn">Serve to <span id="serve-name">Mochi</span></button>
       </div>
@@ -135,11 +176,12 @@
 
     <section class="screen" id="shop-screen">
       <header class="simple-header main-subheader">
-        <div></div><div><h2>Cozy Shop</h2><p>Recipes and little luxuries</p></div>
+        <div></div><div><h2>Cozy Shop</h2><p>Recipes, equipment and little luxuries</p></div>
         <div class="coins"><span>●</span><strong id="coin-count-shop">0</strong></div>
       </header>
       <div class="tabs" id="shop-tabs">
         <button class="tab active" data-tab="recipes">Recipes</button>
+        <button class="tab" data-tab="equipment">Gear</button>
         <button class="tab" data-tab="accessories">Accessories</button>
         <button class="tab" data-tab="decor">Decor</button>
       </div>
@@ -147,6 +189,177 @@
       <nav class="bottom-nav">
         <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
         <button class="nav-btn active" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
+        <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
+        <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="slots-screen">
+      <header class="simple-header main-subheader">
+        <div></div><div><h2>Lucky Cat Slots</h2><p>A tiny bakery casino</p></div>
+        <div class="coins"><span>●</span><strong id="coin-count-slots">0</strong></div>
+      </header>
+
+      <div class="slots-wrap">
+        <div class="slot-cat" aria-hidden="true">
+          <div class="slot-cat-ear left"></div><div class="slot-cat-ear right"></div>
+          <div class="slot-cat-face"><span>•</span><span>ᴗ</span><span>•</span></div>
+        </div>
+        <div class="slot-machine" id="slot-machine">
+          <div class="slot-sign">LUCKY PAWS</div>
+          <div class="slot-reels" aria-label="Slot machine reels">
+            <div class="slot-reel" id="slot-reel-1">🐾</div>
+            <div class="slot-reel" id="slot-reel-2">🍪</div>
+            <div class="slot-reel" id="slot-reel-3">🍓</div>
+          </div>
+          <div class="slot-result" id="slot-result">Pick a bet and give it a spin.</div>
+          <div class="slot-bets" id="slot-bets" aria-label="Choose bet">
+            <button class="slot-bet active" data-bet="5">● 5</button>
+            <button class="slot-bet" data-bet="10">● 10</button>
+            <button class="slot-bet" data-bet="25">● 25</button>
+          </div>
+          <button class="slot-spin" id="slot-spin">Spin for 5</button>
+        </div>
+
+        <div class="slot-paytable">
+          <div><span>🐾🐾🐾</span><strong>×2</strong></div>
+          <div><span>🍪🍪🍪</span><strong>×3</strong></div>
+          <div><span>🍓🍓🍓</span><strong>×4</strong></div>
+          <div><span>🧁🧁🧁</span><strong>×6</strong></div>
+          <div><span>🐟🐟🐟</span><strong>×10</strong></div>
+          <div><span>🐱🐱🐱</span><strong>×15</strong></div>
+          <div><span>👑👑👑</span><strong>×50</strong></div>
+        </div>
+        <p class="slot-note">Any matching pair returns your bet.</p>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
+        <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn active" data-screen="slots-screen"><span>🎰</span>Slots</button>
+        <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
+        <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="vacation-screen">
+      <header class="simple-header main-subheader vacation-header">
+        <div></div><div><h2>Vacation Lake</h2><p>A quiet afternoon of cat fishing</p></div>
+        <div class="coins"><span>●</span><strong id="coin-count-vacation">0</strong></div>
+      </header>
+
+      <div class="vacation-wrap">
+        <div class="lake-scene" id="lake-scene">
+          <div class="lake-sun"></div>
+          <div class="lake-cloud cloud-a"></div><div class="lake-cloud cloud-b"></div>
+          <div class="lake-hills"></div>
+          <div class="lake-water">
+            <div class="water-line one"></div><div class="water-line two"></div><div class="water-line three"></div>
+            <div class="bobber" id="fishing-bobber"></div>
+          </div>
+          <div class="dock"></div>
+          <div class="fishing-cat" aria-hidden="true">
+            <div class="fishing-ear left"></div><div class="fishing-ear right"></div>
+            <div class="fishing-head"><span>•</span><span>ᴗ</span><span>•</span></div>
+            <div class="fishing-body"></div><div class="fishing-tail"></div>
+            <div class="fishing-paw"></div>
+          </div>
+          <div class="fishing-rod"><div class="rod-stick"></div><div class="fishing-line"></div></div>
+        </div>
+
+        <div class="fishing-status-card">
+          <div class="fishing-stats">
+            <div><span>Bait</span><strong id="bait-count">0</strong></div>
+            <div><span>Rod</span><strong id="rod-level">Lv. 1</strong></div>
+            <div><span>Reel</span><strong id="reel-level">Lv. 1</strong></div>
+          </div>
+          <div class="fishing-message" id="fishing-message">The lake is calm. Cast whenever you feel like it.</div>
+          <button class="fishing-action" id="fishing-action">Cast line · 1 bait</button>
+        </div>
+
+        <div class="last-catch" id="last-catch">
+          <span class="last-catch-icon" id="last-catch-icon">🐟</span>
+          <div><strong id="last-catch-name">No catches yet</strong><small id="last-catch-note">There is plenty of time.</small></div>
+        </div>
+
+        <h3 class="vacation-section-title">Tackle Shop</h3>
+        <div class="tackle-shop">
+          <div class="tackle-card">
+            <div class="tackle-icon">🎣</div>
+            <div class="tackle-copy"><strong id="rod-name">Twig Rod</strong><small id="rod-desc">Better rods help you find rarer fish.</small></div>
+            <button class="tackle-buy" id="rod-upgrade">Upgrade</button>
+          </div>
+          <div class="tackle-card">
+            <div class="tackle-icon">⚙️</div>
+            <div class="tackle-copy"><strong id="reel-name">Tin Reel</strong><small id="reel-desc">Better reels improve the value of each catch.</small></div>
+            <button class="tackle-buy" id="reel-upgrade">Upgrade</button>
+          </div>
+        </div>
+
+        <h3 class="vacation-section-title bait-title">Bait</h3>
+        <div class="bait-shop">
+          <button class="bait-buy" data-bait="1" data-price="6"><strong>+1</strong><span>● 6</span></button>
+          <button class="bait-buy" data-bait="5" data-price="25"><strong>+5</strong><span>● 25</span></button>
+          <button class="bait-buy" data-bait="20" data-price="80"><strong>+20</strong><span>● 80</span></button>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
+        <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
+        <button class="nav-btn active" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
+        <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="relax-screen">
+      <header class="simple-header main-subheader relax-header">
+        <div></div><div><h2>Quiet Corner</h2><p>Just you and a sleepy cat</p></div>
+        <button class="icon-btn" id="relax-sound-btn" aria-label="Toggle sound">♪</button>
+      </header>
+
+      <div class="relax-wrap">
+        <div class="relax-room">
+          <div class="relax-window"><div class="relax-sky"></div><div class="relax-moon">☾</div></div>
+          <div class="relax-plant">🌿</div>
+          <div class="relax-rug"></div>
+          <div class="relax-cushion"></div>
+
+          <div class="relax-cat-zone" id="relax-cat-zone" aria-label="Pet the relaxing cat">
+            <div class="relax-cat" id="relax-cat">
+              <div class="relax-tail"></div>
+              <div class="relax-body"></div>
+              <div class="relax-head">
+                <div class="relax-ear left"></div><div class="relax-ear right"></div>
+                <div class="relax-inner-ear left"></div><div class="relax-inner-ear right"></div>
+                <div class="relax-eye left"></div><div class="relax-eye right"></div>
+                <div class="relax-nose"></div><div class="relax-mouth"></div>
+                <div class="relax-whisker w1"></div><div class="relax-whisker w2"></div><div class="relax-whisker w3"></div><div class="relax-whisker w4"></div>
+              </div>
+              <div class="relax-paw left"></div><div class="relax-paw right"></div>
+            </div>
+            <div class="pet-sparkles" id="pet-sparkles"></div>
+          </div>
+        </div>
+
+        <div class="relax-card">
+          <strong id="relax-cat-name">Mochi is relaxing.</strong>
+          <p id="relax-message">Slowly pet across their head or back.</p>
+          <div class="relax-hint"><span>☝</span> drag gently to pet</div>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
+        <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
+        <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
+        <button class="nav-btn active" data-screen="relax-screen"><span>🐈</span>Relax</button>
         <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
@@ -165,6 +378,9 @@
       <nav class="bottom-nav">
         <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
         <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
+        <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
+        <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
         <button class="nav-btn active" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
