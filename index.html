@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#f7d9c4" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Whiskers & Whisks" />
+  <title>Whiskers & Whisks</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app" aria-live="polite">
+    <section class="screen active" id="bakery-screen">
+      <header class="topbar">
+        <button class="icon-btn" id="sound-btn" aria-label="Toggle sound">♪</button>
+        <div class="title-wrap">
+          <h1>Whiskers &amp; Whisks</h1>
+          <p>little cat bake shop</p>
+        </div>
+        <div class="coins"><span>●</span><strong id="coin-count">0</strong></div>
+      </header>
+
+      <div class="bakery-scene" id="bakery-scene">
+        <div class="window">
+          <div class="sky"></div>
+          <div class="cloud c1"></div><div class="cloud c2"></div>
+        </div>
+        <div class="shelf"><span>☕</span><span>🌿</span><span>🥖</span></div>
+        <div class="customer-card">
+          <div class="cat-face customer" id="customer-cat" aria-hidden="true">
+            <div class="ear left"></div><div class="ear right"></div>
+            <div class="inner-ear left"></div><div class="inner-ear right"></div>
+            <div class="eye left"></div><div class="eye right"></div>
+            <div class="nose"></div><div class="mouth"></div>
+            <div class="whisker w1"></div><div class="whisker w2"></div><div class="whisker w3"></div><div class="whisker w4"></div>
+          </div>
+          <div class="speech">
+            <strong id="customer-name">Mochi</strong>
+            <span id="customer-wish">would love a cookie</span>
+          </div>
+          <div class="friendship" id="friendship-row" aria-label="Friendship"></div>
+        </div>
+
+        <div class="counter">
+          <div class="baker-wrap">
+            <div class="accessory" id="baker-accessory"></div>
+            <div class="cat-face baker" id="baker-cat" aria-hidden="true">
+              <div class="ear left"></div><div class="ear right"></div>
+              <div class="inner-ear left"></div><div class="inner-ear right"></div>
+              <div class="eye left"></div><div class="eye right"></div>
+              <div class="nose"></div><div class="mouth"></div>
+              <div class="whisker w1"></div><div class="whisker w2"></div><div class="whisker w3"></div><div class="whisker w4"></div>
+            </div>
+          </div>
+          <div class="pastry-display" id="pastry-display">🍪</div>
+          <button class="primary-btn" id="bake-btn">Bake something</button>
+        </div>
+      </div>
+
+      <nav class="bottom-nav" aria-label="Game navigation">
+        <button class="nav-btn active" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
+        <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="bake-screen">
+      <header class="simple-header">
+        <button class="icon-btn" id="bake-back" aria-label="Back">‹</button>
+        <div><h2 id="bake-title">Cookie</h2><p id="bake-subtitle">Choose a recipe</p></div>
+        <div class="coins"><span>●</span><strong id="coin-count-bake">0</strong></div>
+      </header>
+
+      <div id="recipe-stage" class="stage active-stage">
+        <div class="section-title"><h3>What shall we make?</h3><p>No rush. Pick whatever sounds nice.</p></div>
+        <div class="recipe-grid" id="recipe-grid"></div>
+      </div>
+
+      <div id="ingredient-stage" class="stage">
+        <div class="section-title"><h3>Add the ingredients</h3><p>Tap each one into the bowl.</p></div>
+        <div class="bowl-zone">
+          <div class="bowl" id="ingredient-bowl"><div class="bowl-fill"></div></div>
+          <div class="ingredient-pop" id="ingredient-pop"></div>
+        </div>
+        <div class="ingredient-grid" id="ingredient-grid"></div>
+      </div>
+
+      <div id="mix-stage" class="stage">
+        <div class="section-title"><h3>Mix it gently</h3><p>Swirl your finger around the bowl.</p></div>
+        <div class="mix-zone" id="mix-zone">
+          <div class="mix-bowl"><div class="mix-batter" id="mix-batter"></div><div class="spoon" id="spoon"></div></div>
+        </div>
+        <div class="progress-shell"><div class="progress-fill" id="mix-progress"></div></div>
+      </div>
+
+      <div id="oven-stage" class="stage">
+        <div class="section-title"><h3>Into the oven</h3><p>Hold the warm button until it's ready.</p></div>
+        <div class="oven">
+          <div class="oven-top"><span></span><span></span><span></span></div>
+          <div class="oven-window"><div id="oven-pastry">🍪</div></div>
+        </div>
+        <button class="hold-btn" id="oven-hold">Hold to bake</button>
+        <div class="progress-shell"><div class="progress-fill warm" id="oven-progress"></div></div>
+      </div>
+
+      <div id="decorate-stage" class="stage">
+        <div class="section-title"><h3>Make it yours</h3><p>Decorate as much or as little as you like.</p></div>
+        <div class="plate"><div class="big-pastry" id="decor-pastry">🧁</div><div class="decorations" id="decorations"></div></div>
+        <div class="topping-grid" id="topping-grid"></div>
+        <button class="primary-btn wide" id="serve-btn">Serve to <span id="serve-name">Mochi</span></button>
+      </div>
+
+      <div id="result-stage" class="stage">
+        <div class="result-card">
+          <div class="cat-face result-cat" id="result-cat" aria-hidden="true">
+            <div class="ear left"></div><div class="ear right"></div>
+            <div class="inner-ear left"></div><div class="inner-ear right"></div>
+            <div class="eye left"></div><div class="eye right"></div>
+            <div class="nose"></div><div class="mouth smile"></div>
+            <div class="whisker w1"></div><div class="whisker w2"></div><div class="whisker w3"></div><div class="whisker w4"></div>
+          </div>
+          <div class="result-pastry" id="result-pastry">🍪</div>
+          <h2 id="result-title">Mochi loved it!</h2>
+          <p id="result-note">A very cozy cookie.</p>
+          <div class="reward"><span>●</span><strong id="reward-coins">+8</strong></div>
+          <div class="heart-reward" id="heart-reward">♥ friendship +1</div>
+          <button class="primary-btn wide" id="done-btn">Back to the bakery</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="shop-screen">
+      <header class="simple-header main-subheader">
+        <div></div><div><h2>Cozy Shop</h2><p>Recipes and little luxuries</p></div>
+        <div class="coins"><span>●</span><strong id="coin-count-shop">0</strong></div>
+      </header>
+      <div class="tabs" id="shop-tabs">
+        <button class="tab active" data-tab="recipes">Recipes</button>
+        <button class="tab" data-tab="accessories">Accessories</button>
+        <button class="tab" data-tab="decor">Decor</button>
+      </div>
+      <div class="shop-list" id="shop-list"></div>
+      <nav class="bottom-nav">
+        <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
+        <button class="nav-btn active" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="book-screen">
+      <header class="simple-header main-subheader">
+        <div></div><div><h2>Recipe Book</h2><p>Your bakery memories</p></div>
+        <button class="icon-btn" id="reset-btn" aria-label="Reset save">↻</button>
+      </header>
+      <div class="book-summary">
+        <div><strong id="total-bakes">0</strong><span>bakes</span></div>
+        <div><strong id="known-recipes">1</strong><span>recipes</span></div>
+        <div><strong id="cat-friends">0</strong><span>cat friends</span></div>
+      </div>
+      <div class="memory-list" id="memory-list"></div>
+      <nav class="bottom-nav">
+        <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
+        <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn active" data-screen="book-screen"><span>📖</span>Book</button>
+      </nav>
+    </section>
+
+    <div class="toast" id="toast"></div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
