@@ -175,3 +175,47 @@ button:focus-visible{outline:3px solid rgba(217,137,143,.45);outline-offset:2px}
 .relax-card{margin:-2px 0 0;background:var(--paper);border-radius:22px;padding:17px 18px;text-align:center;box-shadow:0 6px 17px var(--shadow);position:relative;z-index:7}
 .relax-card strong{display:block;font-size:17px}.relax-card p{min-height:20px;margin:6px 0 12px;color:var(--muted);font-size:12px;line-height:1.4}.relax-hint{display:inline-flex;align-items:center;gap:7px;background:#f4e7de;border-radius:999px;padding:8px 12px;color:#8c7167;font-size:11px;font-weight:800}.relax-hint span{font-size:16px}
 @media(max-width:380px){.bottom-nav{padding-left:1px;padding-right:1px}.nav-btn{font-size:7.5px}.nav-btn span{font-size:18px}.relax-cat-zone{width:310px}.relax-cat{left:31px}.relax-rug{width:340px}}
+
+
+/* Cross-mobile viewport hardening (iPhone-first, Android-safe). */
+:root{--app-height:100vh;--bottom-nav-height:74px}
+@supports (height:100dvh){:root{--app-height:100dvh}}
+html,body{width:100%;max-width:100%;min-height:var(--app-height);overflow-x:hidden}
+body{min-height:var(--app-height);touch-action:pan-y}
+#app{min-height:var(--app-height);max-width:540px;width:100%}
+.screen{min-height:var(--app-height);padding-bottom:calc(var(--bottom-nav-height) + env(safe-area-inset-bottom))}
+button,.nav-btn,.recipe-card,.ingredient-btn,.topping-btn,.shop-buy,.slot-bet,.slot-spin,.fishing-action,.bait-buy{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.bakery-scene{height:calc(var(--app-height) - 150px);min-height:0}
+.stage{min-height:calc(var(--app-height) - 80px)}
+.slots-wrap,.vacation-wrap,.relax-wrap{min-height:calc(var(--app-height) - 78px)}
+.bottom-nav{width:min(100vw,540px);height:calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));padding:7px max(4px,env(safe-area-inset-left)) env(safe-area-inset-bottom) max(4px,env(safe-area-inset-right));grid-template-columns:repeat(6,minmax(0,1fr));gap:2px}
+.nav-btn{min-width:0;overflow:hidden;padding:4px 1px;font-size:9px;line-height:1.05;white-space:nowrap}
+.nav-btn span{font-size:20px;line-height:1}
+.toast{max-width:calc(100vw - 24px);white-space:normal;text-align:center}
+
+@media(max-width:400px){
+  .topbar,.simple-header{padding-left:10px;padding-right:10px}
+  .title-wrap h1,.simple-header h2{font-size:18px}
+  .coins{min-width:64px;padding-left:8px;padding-right:8px}
+  .customer-card{width:calc(100% - 20px);padding-left:16px;padding-right:16px;gap:12px}
+  .nav-btn{font-size:8px}.nav-btn span{font-size:19px}
+  .shop-item{min-width:0}.shop-text{min-width:0}.shop-text strong,.shop-text small{overflow-wrap:anywhere}
+}
+
+@media(max-height:640px){
+  .bakery-scene{height:calc(var(--app-height) - 142px)}
+  .window{top:12px;height:108px}.shelf{top:30px}
+  .customer-card{top:148px;height:118px}
+  .customer-card .customer{transform:scale(.86);transform-origin:left center;margin-right:-7px}
+  .counter{height:158px}.baker-wrap{bottom:76px}
+  .stage{padding-top:8px}.section-title{margin-top:2px;margin-bottom:10px}
+}
+
+@media(orientation:landscape) and (max-height:520px){
+  #app{max-width:760px}
+  .bottom-nav{width:min(100vw,760px)}
+  .bakery-scene{min-height:390px;height:calc(var(--app-height) - 138px)}
+  .customer-card{top:105px;left:58%;max-width:410px;height:112px}
+  .window{left:14px;width:105px;height:100px}.shelf{right:14px;top:22px}
+  .counter{height:145px}
+}

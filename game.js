@@ -1,6 +1,22 @@
 (() => {
   'use strict';
 
+  // Keep the app matched to the *visible* mobile viewport. Android Chrome's
+  // collapsing address bar can otherwise leave fixed UI partially off-screen.
+  let viewportRaf = 0;
+  function syncMobileViewport(){
+    cancelAnimationFrame(viewportRaf);
+    viewportRaf=requestAnimationFrame(()=>{
+      const vv=window.visualViewport;
+      const h=Math.max(320,Math.round(vv?.height || window.innerHeight || document.documentElement.clientHeight));
+      document.documentElement.style.setProperty('--app-height',`${h}px`);
+    });
+  }
+  syncMobileViewport();
+  window.addEventListener('resize',syncMobileViewport,{passive:true});
+  window.addEventListener('orientationchange',syncMobileViewport,{passive:true});
+  window.visualViewport?.addEventListener('resize',syncMobileViewport,{passive:true});
+
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 
@@ -281,8 +297,13 @@
     },30);
   }
   function stopOven(){ if(ovenTimer){clearInterval(ovenTimer);ovenTimer=null;} const o=$('.oven');if(o)o.classList.remove('baking'); const s=$('#oven-stage');if(s)s.classList.remove('baker-pressing'); }
-  ['pointerdown','touchstart'].forEach(ev=>$('#oven-hold').addEventListener(ev,e=>{e.preventDefault();startOven();},{passive:false}));
-  ['pointerup','pointercancel','pointerleave','touchend','touchcancel'].forEach(ev=>$('#oven-hold').addEventListener(ev,e=>{e.preventDefault();stopOven();},{passive:false}));
+  const ovenHold=$('#oven-hold');
+  ovenHold.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    try{ovenHold.setPointerCapture(e.pointerId);}catch{}
+    startOven();
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>ovenHold.addEventListener(ev,e=>{e.preventDefault();stopOven();}));
 
   function prepareDecorate(){
     chosenToppings=[]; $('#decorations').innerHTML=''; $('#decor-pastry').textContent=selectedRecipe.emoji; $('#serve-name').textContent=currentCat.name; setStepSubtitle('decorate');

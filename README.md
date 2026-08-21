@@ -37,3 +37,8 @@ Vacation mode adds a calm fishing loop. Casting consumes one bait, fish can be r
 ## Relax mode
 
 The **Quiet Corner** is a zero-pressure petting mode. Drag gently across the lounging cat to pet them. The cat responds with small animations, heart reactions, and a soft purr while touched. There are deliberately no rewards, scores, timers, or progression attached to this mode.
+
+
+## Mobile compatibility
+
+The layout is iPhone-first but includes Android Chrome viewport, touch, safe-area, and narrow-screen compatibility handling.
