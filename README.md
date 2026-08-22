@@ -99,3 +99,11 @@ The Crow mode includes a Dance button that runs a roughly 15-second cat-and-crow
 
 ## v1.26 Book activity records
 The Recipe Book now also records side-activity totals: slot spins, actual slot wins, fish caught, items given to William, items received from William, William dance parties, and the number of times William has delivered one of his statistics/DOE comments. Existing saves keep their prior slot-spin and fish-catch totals; the newly introduced William/slot-win counters begin at zero and accumulate from this version forward.
+
+
+## v1.28 Relax records and naming
+Relax mode now allows the lounging cat to be given a custom persistent name. The Recipe Book records both the number of Relax petting sessions and the cumulative amount of active time spent petting the cat. Petting time is committed to the local save whenever a petting session ends or the page is hidden.
+
+
+## v1.28 Achievements
+The Book now includes a persistent achievement system with more than 50 milestones spanning baking, friendship, shopping, slots, fishing, Relax mode, William de Crow, and cross-mode play. Existing saves are evaluated retroactively where the necessary counters already exist.

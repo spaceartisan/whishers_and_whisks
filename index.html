@@ -352,6 +352,10 @@
           <strong id="relax-cat-name">Mochi is relaxing.</strong>
           <p id="relax-message">Slowly pet across their head or back.</p>
           <div class="relax-hint"><span>☝</span> drag gently to pet</div>
+          <div class="relax-rename">
+            <input id="relax-name-input" type="text" maxlength="24" autocomplete="off" aria-label="Relax cat name" placeholder="Name this cat" />
+            <button id="relax-name-save" type="button">Rename</button>
+          </div>
         </div>
       </div>
 
@@ -439,7 +443,13 @@
           <div class="adventure-stat"><span>💎</span><strong id="book-william-received">0</strong><small>items from William</small></div>
           <div class="adventure-stat"><span>🪩</span><strong id="book-dance-parties">0</strong><small>dance parties</small></div>
           <div class="adventure-stat stats-stat"><span>📊</span><strong id="book-statistics-mentions">0</strong><small>statistics mentions</small></div>
+          <div class="adventure-stat"><span>🐈</span><strong id="book-relax-pets">0</strong><small>petting sessions</small></div>
+          <div class="adventure-stat"><span>💤</span><strong id="book-relax-time">0s</strong><small>time spent petting</small></div>
         </div>
+      </section>
+      <section class="achievements-records" aria-label="Achievements">
+        <div class="achievements-heading"><h3>Achievements</h3><strong id="achievement-count">0 / 0</strong></div>
+        <div id="achievement-list" class="achievement-list"></div>
       </section>
       <div class="memory-list" id="memory-list"></div>
       <nav class="bottom-nav">

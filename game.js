@@ -156,6 +156,76 @@
     { id:'golden', name:'Golden Fish', emoji:'✨', value:150, weight:1, tier:5, minLb:5.00, maxLb:25.00 }
   ];
 
+
+  const achievements = [
+    {id:'first-batch',category:'Bakery',icon:'🍪',title:'First Batch',desc:'Bake your first treat.',goal:1,value:s=>s.totalBakes||0},
+    {id:'bakers-dozen',category:'Bakery',icon:'🥐',title:"Baker's Dozen",desc:'Complete 13 bakes.',goal:13,value:s=>s.totalBakes||0},
+    {id:'flour-power',category:'Bakery',icon:'🌾',title:'Flour Power',desc:'Complete 50 bakes.',goal:50,value:s=>s.totalBakes||0},
+    {id:'century-sweets',category:'Bakery',icon:'🎂',title:'Century of Sweets',desc:'Complete 100 bakes.',goal:100,value:s=>s.totalBakes||0},
+    {id:'recipe-curious',category:'Bakery',icon:'📖',title:'Recipe Curious',desc:'Unlock 3 recipes.',goal:3,value:s=>(s.unlockedRecipes||[]).length},
+    {id:'full-menu',category:'Bakery',icon:'🧁',title:'Full Menu',desc:'Unlock every recipe.',goal:recipes.length,value:s=>(s.unlockedRecipes||[]).length},
+    {id:'one-of-everything',category:'Bakery',icon:'🍰',title:'One of Everything',desc:'Bake every recipe at least once.',goal:recipes.length,value:s=>recipes.filter(r=>(s.bakes?.[r.id]||0)>0).length},
+    {id:'cozy-result',category:'Bakery',icon:'☕',title:'Cozy Result',desc:'Make your first Cozy-quality bake.',goal:1,value:s=>s.qualityCounts?.cozy||0},
+    {id:'fancy-paws',category:'Bakery',icon:'✨',title:'Fancy Paws',desc:'Make your first Fancy-quality bake.',goal:1,value:s=>s.qualityCounts?.fancy||0},
+    {id:'purrfection',category:'Bakery',icon:'💖',title:'Purrfection',desc:'Make your first Purrfect bake.',goal:1,value:s=>s.qualityCounts?.purrfect||0},
+    {id:'cats-meow',category:'Bakery',icon:'🌟',title:"The Cat's Meow",desc:"Make a Cat's Meow-quality bake.",goal:1,value:s=>s.qualityCounts?.['cats-meow']||0},
+    {id:'ten-cats-meows',category:'Bakery',icon:'👑',title:'Meowster Baker',desc:"Make 10 Cat's Meow-quality bakes.",goal:10,value:s=>s.qualityCounts?.['cats-meow']||0},
+
+    {id:'first-friend',category:'Friendship',icon:'♥',title:'First Bakery Friend',desc:'Become best bakery friends with one cat.',goal:1,value:s=>Object.values(s.friendships||{}).filter(v=>v>=5).length},
+    {id:'three-friends',category:'Friendship',icon:'💕',title:'Popular Pastry Cat',desc:'Become best bakery friends with 3 cats.',goal:3,value:s=>Object.values(s.friendships||{}).filter(v=>v>=5).length},
+    {id:'all-friends',category:'Friendship',icon:'🐾',title:'Everybody Knows Your Name',desc:'Become best bakery friends with every customer cat.',goal:cats.length,value:s=>Object.values(s.friendships||{}).filter(v=>v>=5).length},
+    {id:'fifteen-hearts',category:'Friendship',icon:'💗',title:'A Lot of Love',desc:'Earn 15 total friendship hearts.',goal:15,value:s=>Object.values(s.friendships||{}).reduce((a,b)=>a+(Number(b)||0),0)},
+
+    {id:'better-tools',category:'Shop',icon:'🧰',title:'Better Tools',desc:'Upgrade the bakery equipment once.',goal:2,value:s=>s.equipmentLevel||1},
+    {id:'dream-kitchen',category:'Shop',icon:'⚙️',title:'Dream Kitchen',desc:'Reach Bakery Equipment Level 5.',goal:5,value:s=>s.equipmentLevel||1},
+    {id:'interior-designer',category:'Shop',icon:'🪴',title:'Interior Designer',desc:'Own every bakery decor theme.',goal:decor.length,value:s=>(s.ownedDecor||[]).length},
+    {id:'wardrobe-full',category:'Shop',icon:'🎀',title:'Full Wardrobe',desc:'Own every baker accessory.',goal:accessories.length,value:s=>(s.ownedAccessories||[]).length},
+    {id:'pat-biscuit',category:'Shop',icon:'🐱',title:'Payment Accepted',desc:'Pat Biscuit for pantry basics.',goal:1,value:s=>s.clerkPats||0},
+    {id:'biscuit-regular',category:'Shop',icon:'🥣',title:"Biscuit's Regular",desc:'Pat Biscuit 25 times.',goal:25,value:s=>s.clerkPats||0},
+    {id:'biscuit-superfan',category:'Shop',icon:'🐈',title:"Biscuit's Biggest Fan",desc:'Pat Biscuit 100 times.',goal:100,value:s=>s.clerkPats||0},
+
+    {id:'first-spin',category:'Slots',icon:'🎰',title:'Just One Spin',desc:'Play Lucky Cat Slots once.',goal:1,value:s=>s.slotSpins||0},
+    {id:'slot-regular',category:'Slots',icon:'🍓',title:'Lucky Regular',desc:'Play 25 slot spins.',goal:25,value:s=>s.slotSpins||0},
+    {id:'slot-century',category:'Slots',icon:'🐾',title:'One Hundred Spins',desc:'Play 100 slot spins.',goal:100,value:s=>s.slotSpins||0},
+    {id:'first-slot-win',category:'Slots',icon:'✨',title:'Lucky Paw',desc:'Win more than your bet for the first time.',goal:1,value:s=>s.slotWins||0},
+    {id:'ten-slot-wins',category:'Slots',icon:'🍀',title:'On a Roll',desc:'Win 10 times at the slots.',goal:10,value:s=>s.slotWins||0},
+    {id:'twentyfive-slot-wins',category:'Slots',icon:'👑',title:'House Cat',desc:'Win 25 times at the slots.',goal:25,value:s=>s.slotWins||0},
+
+    {id:'first-fish',category:'Fishing',icon:'🐟',title:'Gone Fishing',desc:'Catch your first fish.',goal:1,value:s=>s.fishCaught||0},
+    {id:'fish-25',category:'Fishing',icon:'🎣',title:'Lake Regular',desc:'Catch 25 fish.',goal:25,value:s=>s.fishCaught||0},
+    {id:'fish-100',category:'Fishing',icon:'🐠',title:'Master Angler',desc:'Catch 100 fish.',goal:100,value:s=>s.fishCaught||0},
+    {id:'five-pounder',category:'Fishing',icon:'🏅',title:'That One Was This Big',desc:'Record a fish weighing at least 5 lb.',goal:5,value:s=>Math.max(0,...(s.fishRecords||[]).map(r=>Number(r.sizeLb)||0),Number(s.fishingLast?.sizeLb)||0)},
+    {id:'ten-pounder',category:'Fishing',icon:'🏆',title:'Trophy Fish',desc:'Record a fish weighing at least 10 lb.',goal:10,value:s=>Math.max(0,...(s.fishRecords||[]).map(r=>Number(r.sizeLb)||0),Number(s.fishingLast?.sizeLb)||0)},
+    {id:'twenty-pounder',category:'Fishing',icon:'🌊',title:'Lake Monster',desc:'Record a fish weighing at least 20 lb.',goal:20,value:s=>Math.max(0,...(s.fishRecords||[]).map(r=>Number(r.sizeLb)||0),Number(s.fishingLast?.sizeLb)||0)},
+    {id:'star-rod',category:'Fishing',icon:'🎣',title:'Star Rod',desc:'Reach Rod Level 5.',goal:5,value:s=>s.fishingRodLevel||1},
+    {id:'golden-reel',category:'Fishing',icon:'⚙️',title:'Golden Reel',desc:'Reach Reel Level 5.',goal:5,value:s=>s.fishingReelLevel||1},
+
+    {id:'crumb-for-william',category:'William',icon:'🍞',title:'A Crumb for William',desc:'Give William something once.',goal:1,value:s=>s.williamItemsGiven||0},
+    {id:'william-snacks',category:'William',icon:'🥖',title:'Crow Catering',desc:'Give William 25 items.',goal:25,value:s=>s.williamItemsGiven||0},
+    {id:'first-shiny',category:'William',icon:'💎',title:'Crow Gift',desc:'Receive your first item from William.',goal:1,value:s=>s.williamItemsReceived||0},
+    {id:'shiny-collection',category:'William',icon:'🔔',title:'Shiny Collection',desc:'Receive 25 items from William.',goal:25,value:s=>s.williamItemsReceived||0},
+    {id:'first-dance',category:'William',icon:'🪩',title:'Birds of a Feather',desc:'Have one dance party with William.',goal:1,value:s=>s.williamDanceParties||0},
+    {id:'dance-ten',category:'William',icon:'🎵',title:'Tiny Dance Club',desc:'Have 10 dance parties.',goal:10,value:s=>s.williamDanceParties||0},
+    {id:'dance-25',category:'William',icon:'🎉',title:'Friday Night Caw',desc:'Have 25 dance parties.',goal:25,value:s=>s.williamDanceParties||0},
+    {id:'stats-first',category:'William',icon:'📊',title:'Unexpected Statistics',desc:'Hear William mention statistics once.',goal:1,value:s=>s.williamStatisticsMentions||0},
+    {id:'stats-ten',category:'William',icon:'📈',title:'Crow-Designed Experiment',desc:'Hear 10 statistical comments from William.',goal:10,value:s=>s.williamStatisticsMentions||0},
+    {id:'stats-25',category:'William',icon:'🧪',title:'Standard Least Squawks',desc:'Hear 25 statistical comments from William.',goal:25,value:s=>s.williamStatisticsMentions||0},
+
+    {id:'first-pet',category:'Relax',icon:'🐈',title:'Just One Pet',desc:'Start your first Relax petting session.',goal:1,value:s=>s.relaxPetSessions||0},
+    {id:'pet-five-min',category:'Relax',icon:'💤',title:'Five Quiet Minutes',desc:'Spend 5 minutes actively petting.',goal:5*60*1000,value:s=>s.relaxPetTimeMs||0,format:'time'},
+    {id:'pet-thirty-min',category:'Relax',icon:'🌙',title:'Half-Hour Purr',desc:'Spend 30 minutes actively petting.',goal:30*60*1000,value:s=>s.relaxPetTimeMs||0,format:'time'},
+    {id:'pet-one-hour',category:'Relax',icon:'💗',title:'Professional Cat Petter',desc:'Spend 1 hour actively petting.',goal:60*60*1000,value:s=>s.relaxPetTimeMs||0,format:'time'},
+    {id:'named-relax-cat',category:'Relax',icon:'✏️',title:'A Proper Name',desc:'Give the Relax cat a custom name.',goal:1,value:s=>(s.relaxCatName||'').trim()?1:0},
+
+    {id:'try-everything',category:'Grand Tour',icon:'🌈',title:'A Little Bit of Everything',desc:'Bake, play slots, fish, pet a cat, and hang out with William.',goal:5,value:s=>[
+      (s.totalBakes||0)>0,(s.slotSpins||0)>0,(s.fishCaught||0)>0,(s.relaxPetSessions||0)>0,((s.williamItemsGiven||0)+(s.williamItemsReceived||0)+(s.williamDanceParties||0)+(s.williamStatisticsMentions||0))>0
+    ].filter(Boolean).length},
+    {id:'cozy-completionist',category:'Grand Tour',icon:'🏡',title:'Cozy Completionist',desc:'Own all recipes, decor, accessories, and max the bakery equipment.',goal:4,value:s=>[
+      (s.unlockedRecipes||[]).length>=recipes.length,(s.ownedDecor||[]).length>=decor.length,(s.ownedAccessories||[]).length>=accessories.length,(s.equipmentLevel||1)>=5
+    ].filter(Boolean).length},
+    {id:'bake-and-catch',category:'Grand Tour',icon:'🍪',title:'Bake & Bait',desc:'Complete 25 bakes and catch 25 fish.',goal:2,value:s=>[(s.totalBakes||0)>=25,(s.fishCaught||0)>=25].filter(Boolean).length}
+  ];
+
   const toppings = ['🍓','✨','🌸','🍫','🫐','🤍'];
   const saveKey = 'whiskersAndWhisksSaveV1';
   const fresh = () => ({
@@ -166,6 +236,8 @@
     bait:5, fishingRodLevel:1, fishingReelLevel:1, fishCaught:0,
     fishingLast:null, fishingEarned:0, fishRecords:[],
     williamItemsGiven:0, williamItemsReceived:0, williamDanceParties:0, williamStatisticsMentions:0,
+    relaxCatName:'', relaxPetSessions:0, relaxPetTimeMs:0,
+    unlockedAchievements:{},
     ingredientStock:{pantry:5,fresh:0,choice:0,clover:0,moonlit:0}, lastIngredientGrade:'pantry',
     qualityCounts:{homey:0,cozy:0,fancy:0,purrfect:0,'cats-meow':0}, clerkPats:0
   });
@@ -195,6 +267,7 @@
   let relaxLastPoint = null;
   let relaxStrokeCount = 0;
   let relaxPurr = null;
+  let relaxPetStartedAt = null;
   let crowDanceTimer = null;
   let crowDanceBeatTimer = null;
   let crowDanceEmojiTimer = null;
@@ -205,10 +278,39 @@
       const next = Object.assign(fresh(), parsed || {});
       next.ingredientStock = Object.assign(fresh().ingredientStock, parsed?.ingredientStock || {});
       next.qualityCounts = Object.assign(fresh().qualityCounts, parsed?.qualityCounts || {});
+      next.unlockedAchievements = Object.assign({}, parsed?.unlockedAchievements || {});
       return next;
     } catch { return fresh(); }
   }
-  function save(){ localStorage.setItem(saveKey, JSON.stringify(state)); updateAll(); }
+  function achievementProgress(achievement){
+    const value=Math.max(0,Number(achievement.value(state))||0);
+    const goal=Math.max(1,Number(achievement.goal)||1);
+    return {value,goal,ratio:clamp(value/goal,0,1),unlocked:value>=goal};
+  }
+  function evaluateAchievements(showNotice=true){
+    state.unlockedAchievements=state.unlockedAchievements&&typeof state.unlockedAchievements==='object'?state.unlockedAchievements:{};
+    const newly=[];
+    achievements.forEach(achievement=>{
+      const progress=achievementProgress(achievement);
+      if(progress.unlocked&&!state.unlockedAchievements[achievement.id]){
+        state.unlockedAchievements[achievement.id]=Date.now();
+        newly.push(achievement);
+      }
+    });
+    if(showNotice&&newly.length){
+      setTimeout(()=>{
+        ding('heart');
+        toast(newly.length===1?`Achievement: ${newly[0].title}`:`${newly.length} achievements unlocked!`);
+      },0);
+    }
+    return newly;
+  }
+  function save(){
+    const newly=evaluateAchievements(false);
+    localStorage.setItem(saveKey, JSON.stringify(state));
+    updateAll();
+    if(newly.length)setTimeout(()=>{ding('heart');toast(newly.length===1?`Achievement: ${newly[0].title}`:`${newly.length} achievements unlocked!`);},0);
+  }
   function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
   function formatCoins(n){ return Math.floor(n).toLocaleString(); }
   function equipmentInfo(){ return equipmentLevels.find(e=>e.level===Number(state.equipmentLevel)) || equipmentLevels[0]; }
@@ -793,7 +895,10 @@
       room.className='relax-room';
       if(state.equippedDecor!=='classic')room.classList.add(`theme-${state.equippedDecor}`);
     }
-    const name=$('#relax-cat-name'); if(name)name.textContent=`${currentCat.name} is relaxing.`;
+    const relaxName=(state.relaxCatName||'').trim() || currentCat.name;
+    const name=$('#relax-cat-name'); if(name)name.textContent=`${relaxName} is relaxing.`;
+    const nameInput=$('#relax-name-input');
+    if(nameInput && document.activeElement!==nameInput)nameInput.value=state.relaxCatName||'';
     const sound=$('#relax-sound-btn'); if(sound)sound.textContent=state.sound?'♪':'♩';
   }
 
@@ -844,13 +949,24 @@
   }
 
   function endRelaxPetting(){
-    relaxPetting=false; relaxLastPoint=null; stopRelaxPurr();
+    const wasPetting=relaxPetting;
+    if(wasPetting && relaxPetStartedAt!==null){
+      const elapsed=Math.max(0,Date.now()-relaxPetStartedAt);
+      state.relaxPetTimeMs=(Number(state.relaxPetTimeMs)||0)+elapsed;
+    }
+    relaxPetting=false; relaxLastPoint=null; relaxPetStartedAt=null; stopRelaxPurr();
     const cat=$('#relax-cat'); if(cat)cat.classList.remove('purring');
+    if(wasPetting)save();
   }
 
   const relaxZone=$('#relax-cat-zone');
   relaxZone?.addEventListener('pointerdown',e=>{
-    e.preventDefault(); relaxPetting=true; relaxLastPoint={x:e.clientX,y:e.clientY};
+    e.preventDefault();
+    if(!relaxPetting){
+      state.relaxPetSessions=(Number(state.relaxPetSessions)||0)+1;
+      relaxPetStartedAt=Date.now();
+    }
+    relaxPetting=true; relaxLastPoint={x:e.clientX,y:e.clientY};
     try{relaxZone.setPointerCapture(e.pointerId);}catch{}
     startRelaxPurr(); relaxPetAt(e.clientX,e.clientY);
   });
@@ -864,6 +980,17 @@
   $('#relax-sound-btn')?.addEventListener('click',()=>{
     state.sound=!state.sound; if(!state.sound)endRelaxPetting(); save(); if(state.sound)ding('heart');
   });
+  function saveRelaxCatName(){
+    const input=$('#relax-name-input');
+    if(!input)return;
+    const value=input.value.trim().slice(0,24);
+    state.relaxCatName=value;
+    save();
+    const shown=value || currentCat.name;
+    toast(value?`${shown} has a new name`:`Using ${shown}'s regular name`);
+  }
+  $('#relax-name-save')?.addEventListener('click',saveRelaxCatName);
+  $('#relax-name-input')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveRelaxCatName();e.currentTarget.blur();}});
 
   const defaultCrowDialogue={
     jokes:[
@@ -999,6 +1126,15 @@
   $('#crow-dance-btn')?.addEventListener('click',startWilliamDance);
   $('#crow-sound-btn')?.addEventListener('click',()=>{state.sound=!state.sound;save();if(state.sound)crowChirp();});
 
+  function formatRelaxTime(ms){
+    const totalSeconds=Math.max(0,Math.floor((Number(ms)||0)/1000));
+    if(totalSeconds<60)return `${totalSeconds}s`;
+    const minutes=Math.floor(totalSeconds/60), seconds=totalSeconds%60;
+    if(minutes<60)return `${minutes}m ${seconds}s`;
+    const hours=Math.floor(minutes/60), mins=minutes%60;
+    return `${hours}h ${mins}m`;
+  }
+
   function renderBook(){
     $('#total-bakes').textContent=state.totalBakes; $('#known-recipes').textContent=state.unlockedRecipes.length;
     $('#cat-friends').textContent=Object.values(state.friendships).filter(v=>v>=5).length;
@@ -1009,9 +1145,27 @@
       'book-william-given':state.williamItemsGiven||0,
       'book-william-received':state.williamItemsReceived||0,
       'book-dance-parties':state.williamDanceParties||0,
-      'book-statistics-mentions':state.williamStatisticsMentions||0
+      'book-statistics-mentions':state.williamStatisticsMentions||0,
+      'book-relax-pets':state.relaxPetSessions||0
     };
     Object.entries(adventureStats).forEach(([id,value])=>{const el=$(`#${id}`);if(el)el.textContent=formatCoins(value);});
+    const relaxTime=$('#book-relax-time'); if(relaxTime)relaxTime.textContent=formatRelaxTime(state.relaxPetTimeMs||0);
+    const achievementCount=$('#achievement-count');
+    const achievementList=$('#achievement-list');
+    const unlockedCount=achievements.filter(a=>!!state.unlockedAchievements?.[a.id]).length;
+    if(achievementCount)achievementCount.textContent=`${unlockedCount} / ${achievements.length}`;
+    if(achievementList){
+      const categories=[...new Set(achievements.map(a=>a.category))];
+      achievementList.innerHTML=categories.map(category=>{
+        const cards=achievements.filter(a=>a.category===category).map(a=>{
+          const progress=achievementProgress(a), unlocked=!!state.unlockedAchievements?.[a.id];
+          const valueText=a.format==='time'?formatRelaxTime(progress.value):formatCoins(Math.min(progress.value,progress.goal));
+          const goalText=a.format==='time'?formatRelaxTime(progress.goal):formatCoins(progress.goal);
+          return `<div class="achievement-card ${unlocked?'unlocked':'locked'}"><div class="achievement-icon">${a.icon}</div><div class="achievement-copy"><strong>${a.title}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${Math.round(progress.ratio*100)}%"></span></div><em>${unlocked?'Unlocked':`${valueText} / ${goalText}`}</em></div><div class="achievement-check">${unlocked?'✓':'○'}</div></div>`;
+        }).join('');
+        return `<div class="achievement-category"><h4>${category}</h4>${cards}</div>`;
+      }).join('');
+    }
     const list=$('#memory-list');
     if(!state.totalBakes){list.innerHTML='<div class="empty-memory">Your recipe book is waiting for its first cozy bake.<br><br>Nothing here can be messed up.</div>';return;}
     const byRecipe=recipes.filter(r=>state.bakes[r.id]).map(r=>({r,count:state.bakes[r.id]}));
@@ -1039,6 +1193,8 @@
     return state.coins;
   };
 
+  evaluateAchievements(false);
+  localStorage.setItem(saveKey, JSON.stringify(state));
   updateAll();
   loadAccessoryPositions();
   loadBakerPawPositions();
