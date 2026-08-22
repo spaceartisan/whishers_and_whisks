@@ -117,3 +117,8 @@ Relax mode now includes persistent fur-color customization with several presets 
 ## v1.30 — New fur-pattern presets
 
 Added three new player-cat appearance presets in Relax mode: **Silver Tabby**, **Tuxedo**, and **Cow Pattern**. Choosing one updates the player cat everywhere it appears (Bakery, Relax, Vacation Lake, and William de Crow mode). Solid color presets and the custom color picker still work as before.
+
+
+## v1.31 — Ear visibility fix
+
+Fixed player-cat ear clipping in the new fur-pattern presets. Bakery, Relax, and William de Crow scenes no longer clip or hide the ears. Vacation was already correct and remains unchanged.
