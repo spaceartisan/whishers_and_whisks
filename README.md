@@ -42,3 +42,12 @@ The **Quiet Corner** is a zero-pressure petting mode. Drag gently across the lou
 ## Mobile compatibility
 
 The layout is iPhone-first but includes Android Chrome viewport, touch, safe-area, and narrow-screen compatibility handling.
+
+- Vacation Lake now tracks a persistent Top 3 Biggest Fish leaderboard by catch weight.
+
+## v1.12 Pantry & Bake Quality
+
+The Cozy Shop now has a **Pantry** tab. Biscuit the shop cat gives free Pantry Basics when petted, while four paid ingredient grades can be stocked in bake baskets. Each completed recipe consumes one basket of the selected grade. Better ingredients increase recipe payouts, grant more friendship, and add a quality bonus to the final bake roll.
+
+Bake results now have five bakery-themed quality levels: **Homey**, **Cozy**, **Fancy**, **Purrfect**, and **Cat's Meow**. Higher-quality results add an additional coin multiplier and are recorded with the bake in the recipe book. Existing saves automatically receive five Pantry Basics baskets.
+

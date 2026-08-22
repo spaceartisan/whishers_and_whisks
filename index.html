@@ -85,6 +85,13 @@
         <div class="recipe-grid" id="recipe-grid"></div>
       </div>
 
+      <div id="supplies-stage" class="stage">
+        <div class="section-title"><h3>Choose your ingredients</h3><p>Better ingredients can make a more special bake.</p></div>
+        <div class="supply-choice-summary" id="supply-choice-summary"></div>
+        <div class="supply-choice-grid" id="supply-choice-grid"></div>
+        <button class="secondary-btn pantry-shortcut" id="pantry-shortcut">Visit Biscuit's pantry</button>
+      </div>
+
       <div id="ingredient-stage" class="stage">
         <div class="section-title"><h3>Add the ingredients</h3><p>Tap each one into the bowl.</p></div>
         <div class="bowl-zone">
@@ -165,6 +172,7 @@
             <div class="whisker w1"></div><div class="whisker w2"></div><div class="whisker w3"></div><div class="whisker w4"></div>
           </div>
           <div class="result-pastry" id="result-pastry">🍪</div>
+          <div class="quality-badge quality-homey" id="quality-badge">Homey</div>
           <h2 id="result-title">Mochi loved it!</h2>
           <p id="result-note">A very cozy cookie.</p>
           <div class="reward"><span>●</span><strong id="reward-coins">+8</strong></div>
@@ -176,11 +184,12 @@
 
     <section class="screen" id="shop-screen">
       <header class="simple-header main-subheader">
-        <div></div><div><h2>Cozy Shop</h2><p>Recipes, equipment and little luxuries</p></div>
+        <div></div><div><h2>Cozy Shop</h2><p>Recipes, pantry goods and little luxuries</p></div>
         <div class="coins"><span>●</span><strong id="coin-count-shop">0</strong></div>
       </header>
       <div class="tabs" id="shop-tabs">
         <button class="tab active" data-tab="recipes">Recipes</button>
+        <button class="tab" data-tab="pantry">Pantry</button>
         <button class="tab" data-tab="equipment">Gear</button>
         <button class="tab" data-tab="accessories">Accessories</button>
         <button class="tab" data-tab="decor">Decor</button>
@@ -284,6 +293,9 @@
           <span class="last-catch-icon" id="last-catch-icon">🐟</span>
           <div><strong id="last-catch-name">No catches yet</strong><small id="last-catch-note">There is plenty of time.</small></div>
         </div>
+
+        <h3 class="vacation-section-title record-title">Top 3 Biggest Fish</h3>
+        <div class="fish-records" id="fish-records" aria-label="Top three biggest fish"></div>
 
         <h3 class="vacation-section-title">Tackle Shop</h3>
         <div class="tackle-shop">

@@ -23,7 +23,7 @@ button:focus-visible{outline:3px solid rgba(217,137,143,.45);outline-offset:2px}
 .cat-face{position:relative;width:100px;height:90px;border-radius:48% 48% 46% 46%;background:var(--cat,#d7a875);box-shadow:inset 0 -8px 0 rgba(83,58,48,.06),0 6px 14px rgba(91,66,56,.12);flex:0 0 auto}.cat-face .ear{position:absolute;width:40px;height:44px;background:var(--cat,#d7a875);top:-17px;clip-path:polygon(50% 0,100% 100%,0 100%)}.cat-face .ear.left{left:4px;transform:rotate(-9deg)}.cat-face .ear.right{right:4px;transform:rotate(9deg)}.cat-face .inner-ear{position:absolute;width:20px;height:25px;background:#e9aaa9;top:-9px;clip-path:polygon(50% 0,100% 100%,0 100%);z-index:2;opacity:.75}.cat-face .inner-ear.left{left:14px;transform:rotate(-9deg)}.cat-face .inner-ear.right{right:14px;transform:rotate(9deg)}
 .cat-face .eye{position:absolute;top:38px;width:9px;height:12px;background:#493a35;border-radius:50%;z-index:3}.cat-face .eye.left{left:29px}.cat-face .eye.right{right:29px}.cat-face .nose{position:absolute;left:50%;top:54px;width:10px;height:7px;background:#b96f76;border-radius:50% 50% 55% 55%;transform:translateX(-50%);z-index:3}.cat-face .mouth{position:absolute;left:50%;top:61px;width:22px;height:10px;border-bottom:2px solid #5b4540;border-radius:0 0 50% 50%;transform:translateX(-50%);z-index:3}.cat-face .mouth.smile{height:15px;border-bottom-width:3px}.cat-face .whisker{position:absolute;width:30px;height:1px;background:#785f56;top:62px;opacity:.65}.cat-face .w1{left:-8px;transform:rotate(8deg)}.cat-face .w2{left:-7px;top:69px;transform:rotate(-8deg)}.cat-face .w3{right:-8px;transform:rotate(-8deg)}.cat-face .w4{right:-7px;top:69px;transform:rotate(8deg)}
 .speech{flex:1;min-width:0}.speech strong{display:block;font-size:22px;margin-bottom:5px}.speech span{display:block;font-size:14px;color:var(--muted);line-height:1.3}.friendship{position:absolute;bottom:15px;left:140px;display:flex;gap:5px}.friendship span{font-size:15px;color:#d5c8c2}.friendship span.filled{color:var(--rose)}
-.counter{position:absolute;left:0;right:0;bottom:0;height:180px;background:linear-gradient(var(--counter),var(--counter2));border-top:10px solid #e9b187;box-shadow:0 -8px 24px rgba(89,56,46,.14)}.baker-wrap{position:absolute;left:18px;bottom:86px;width:88px;height:100px}.baker{transform:scale(.72);transform-origin:bottom left}.accessory{position:absolute;left:0;top:-14px;width:74px;height:55px;z-index:6;pointer-events:none;font-size:43px;text-align:center;transform:rotate(-7deg)}.pastry-display{position:absolute;left:50%;top:16px;transform:translateX(-50%);width:84px;height:56px;border-radius:50%;background:#fff5dc;display:grid;place-items:center;font-size:40px;box-shadow:0 6px 12px rgba(74,49,42,.18),inset 0 -5px 0 rgba(155,103,76,.08)}.primary-btn{position:absolute;left:50%;bottom:17px;transform:translateX(-50%);border:0;background:var(--paper);padding:14px 24px;border-radius:18px;font-weight:800;box-shadow:0 6px 14px rgba(75,47,40,.18);cursor:pointer;white-space:nowrap}.primary-btn:active{transform:translateX(-50%) scale(.98)}
+.counter{position:absolute;left:0;right:0;bottom:0;height:180px;background:linear-gradient(var(--counter),var(--counter2));border-top:10px solid #e9b187;box-shadow:0 -8px 24px rgba(89,56,46,.14)}.baker-wrap{position:absolute;left:18px;bottom:82px;width:106px;height:118px}.baker-wrap:before{content:"";position:absolute;left:13px;bottom:-8px;width:76px;height:56px;background:var(--baker-cat);border-radius:46px 46px 16px 16px;box-shadow:inset 0 -8px 0 rgba(83,58,48,.06),0 5px 10px rgba(91,66,56,.12);z-index:1}.baker-wrap:after{content:"";position:absolute;left:34px;bottom:26px;width:34px;height:18px;background:var(--baker-cat);border-radius:0 0 20px 20px;z-index:2}.baker{position:absolute;left:0;bottom:15px;z-index:3;transform:scale(.72);transform-origin:bottom left}.accessory{position:absolute;left:0;top:-14px;width:74px;height:55px;z-index:6;pointer-events:none;font-size:43px;text-align:center;transform:rotate(-7deg)}.pastry-display{position:absolute;left:50%;top:16px;transform:translateX(-50%);width:84px;height:56px;border-radius:50%;background:#fff5dc;display:grid;place-items:center;font-size:40px;box-shadow:0 6px 12px rgba(74,49,42,.18),inset 0 -5px 0 rgba(155,103,76,.08)}.primary-btn{position:absolute;left:50%;bottom:17px;transform:translateX(-50%);border:0;background:var(--paper);padding:14px 24px;border-radius:18px;font-weight:800;box-shadow:0 6px 14px rgba(75,47,40,.18);cursor:pointer;white-space:nowrap}.primary-btn:active{transform:translateX(-50%) scale(.98)}
 .hold-btn:active,.shop-buy:active,.recipe-card:active,.topping-btn:active,.ingredient-btn:active{transform:scale(.98)}
 .bottom-nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,540px);height:calc(74px + env(safe-area-inset-bottom));padding:8px 22px env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(6,1fr);background:rgba(255,253,248,.97);border-top:1px solid rgba(112,84,72,.08);backdrop-filter:blur(12px)}.nav-btn{border:0;background:transparent;border-radius:16px;color:#a68d82;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}.nav-btn span{font-size:23px;filter:grayscale(.5);opacity:.75}.nav-btn.active{color:var(--ink);background:#f8eadf}.nav-btn.active span{filter:none;opacity:1}
 .simple-header{grid-template-columns:48px 1fr auto}.main-subheader{grid-template-columns:48px 1fr 72px}.stage{display:none;padding:18px 18px 30px;min-height:calc(100svh - 80px)}.stage.active-stage{display:block}.section-title{text-align:center;margin:8px auto 18px}.section-title h3{margin:0;font-size:24px}.section-title p{margin:5px 0 0;color:var(--muted);font-size:13px}.recipe-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.recipe-card{border:0;min-height:132px;background:var(--paper);border-radius:22px;box-shadow:0 6px 18px var(--shadow);padding:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative}.recipe-card .emoji{font-size:48px}.recipe-card strong{font-size:15px;margin-top:6px}.recipe-card small{color:var(--muted);margin-top:3px}.recipe-card.locked{filter:saturate(.55);opacity:.64}.recipe-card .lock{position:absolute;top:10px;right:12px;font-size:14px}
@@ -43,7 +43,7 @@ button:focus-visible{outline:3px solid rgba(217,137,143,.45);outline-offset:2px}
 .cat-paw{width:58px;height:48px;border-radius:48% 48% 45% 45%;background:var(--baker-cat);position:absolute;z-index:5;box-shadow:inset 0 -5px 0 rgba(89,57,47,.06),0 5px 10px rgba(83,57,47,.12);pointer-events:none}
 .cat-paw:before{content:"";position:absolute;left:50%;bottom:8px;width:25px;height:20px;transform:translateX(-50%);border-radius:48% 48% 55% 55%;background:var(--paw-pad);opacity:.8}
 .cat-paw:after{content:"";position:absolute;left:50%;top:9px;width:11px;height:12px;transform:translateX(-50%);border-radius:50%;background:var(--paw-pad);box-shadow:-15px 5px 0 var(--paw-pad),15px 5px 0 var(--paw-pad);opacity:.8}
-.counter-paw{top:-27px;z-index:7;transform:rotate(180deg)}.counter-paw.left{left:105px;transform:rotate(171deg)}.counter-paw.right{left:163px;transform:rotate(189deg)}
+.counter-paw{top:-18px;z-index:7;transform:rotate(180deg)}.counter-paw.left{left:66px;transform:rotate(168deg)}.counter-paw.right{left:108px;transform:rotate(192deg)}
 .stage-paw{z-index:6}.ingredient-paw{top:55px}.ingredient-paw.left{left:calc(50% - 145px);transform:rotate(78deg)}.ingredient-paw.right{right:calc(50% - 145px);transform:rotate(-78deg)}
 .paw-boop .ingredient-paw.right{animation:ingredientPawBoop .42s ease}@keyframes ingredientPawBoop{0%,100%{transform:rotate(-78deg) translateY(0)}48%{transform:rotate(-66deg) translate(-18px,20px)}}
 .mix-zone{position:relative}.mix-paw{top:50%;margin-top:-22px}.mix-paw.left{left:calc(50% - 164px);transform:rotate(72deg)}.mix-paw.right{right:calc(50% - 164px);transform:rotate(-72deg)}
@@ -61,13 +61,13 @@ button:focus-visible{outline:3px solid rgba(217,137,143,.45);outline-offset:2px}
 .press-mark{width:27px;height:19px;background:rgba(150,102,58,.13)}
 .oven-control{height:64px;display:flex;justify-content:center;align-items:center;gap:8px;position:relative;margin:0 auto 8px;max-width:330px}.oven-control .hold-btn{margin:0;position:relative;z-index:3}.oven-paw{position:relative;flex:0 0 52px;width:52px;height:43px;top:auto;left:auto;right:auto;transition:transform .15s}.oven-paw.left{transform:rotate(92deg)}.oven-paw.right{transform:rotate(-92deg)}#oven-stage.baker-pressing .oven-paw.left{transform:rotate(82deg) translateX(10px)}#oven-stage.baker-pressing .oven-paw.right{transform:rotate(-82deg) translateX(-10px)}
 .plate-wrap{position:relative;width:360px;max-width:100%;margin:0 auto}.plate-wrap .plate{margin:4px auto 15px}.decor-paw{top:145px}.decor-paw.left{left:12px;transform:rotate(70deg)}.decor-paw.right{right:12px;transform:rotate(-70deg)}.topping-btn:active{transform:scale(.94) rotate(-2deg)}
-@media(max-width:380px){.counter-paw.left{left:94px}.counter-paw.right{left:148px}.ingredient-paw.left{left:calc(50% - 136px)}.ingredient-paw.right{right:calc(50% - 136px)}.mix-paw.left{left:calc(50% - 151px)}.mix-paw.right{right:calc(50% - 151px)}.knead-board{width:292px}.knead-paw.left{left:58px}.knead-paw.right{right:58px}.decor-paw.left{left:4px}.decor-paw.right{right:4px}}
+@media(max-width:380px){.counter-paw.left{left:58px}.counter-paw.right{left:96px}.ingredient-paw.left{left:calc(50% - 136px)}.ingredient-paw.right{right:calc(50% - 136px)}.mix-paw.left{left:calc(50% - 151px)}.mix-paw.right{right:calc(50% - 151px)}.knead-board{width:292px}.knead-paw.left{left:58px}.knead-paw.right{right:58px}.decor-paw.left{left:4px}.decor-paw.right{right:4px}}
 
 
 /* Accessory render fix: shop can use emoji icons, but the baker cat uses simple drawn overlays instead. */
 .accessory{position:absolute;z-index:8;pointer-events:none;font-size:0;display:none}
 .accessory:before,.accessory:after{content:"";position:absolute;box-sizing:border-box}
-.accessory-chef,.accessory-crown{display:block;left:14px;top:-3px;width:58px;height:40px}
+.accessory-chef{display:block;left:14px;top:-3px;width:58px;height:40px}.accessory-crown{display:block;left:18px;top:3px;width:44px;height:28px}
 .accessory-bow{display:block;left:32px;top:14px;width:30px;height:24px}
 .accessory-flower{display:block;left:15px;top:12px;width:28px;height:28px}
 .accessory-glasses{display:block;left:13px;top:20px;width:54px;height:18px}
@@ -92,8 +92,8 @@ button:focus-visible{outline:3px solid rgba(217,137,143,.45);outline-offset:2px}
   linear-gradient(#584944,#584944) center 9px / 10px 3px no-repeat}
 .accessory-glasses:after{left:1px;top:2px;width:52px;height:3px;background:linear-gradient(90deg, rgba(88,73,68,.55) 0 9px, transparent 9px 43px, rgba(88,73,68,.55) 43px 52px);border-radius:99px}
 
-.accessory-crown:before{left:8px;top:0;width:42px;height:22px;background:linear-gradient(#f0cb64,#da9f32);clip-path:polygon(0 100%,0 50%,13% 58%,24% 6%,40% 50%,50% 32%,60% 50%,76% 6%,87% 58%,100% 50%,100% 100%);filter:drop-shadow(0 2px 0 rgba(110,79,29,.3))}
-.accessory-crown:after{left:11px;top:18px;width:36px;height:8px;border-radius:0 0 7px 7px;background:#efc95d;box-shadow:4px -12px 0 -2px #e0687e,14px -14px 0 -2px #70b7ff,24px -12px 0 -2px #93c95c}
+.accessory-crown:before{left:0;top:0;width:44px;height:18px;background:linear-gradient(#f4d064,#d89f33);clip-path:polygon(0 100%,0 52%,15% 60%,25% 0,50% 48%,75% 0,85% 60%,100% 52%,100% 100%);filter:drop-shadow(0 2px 0 rgba(110,79,29,.28))}
+.accessory-crown:after{left:3px;top:15px;width:38px;height:9px;border-radius:0 0 7px 7px;background:linear-gradient(#f0cb64,#e2ac41);box-shadow:inset 0 -2px 0 rgba(120,82,25,.14)}
 
 
 /* Equipment progression */
@@ -134,6 +134,7 @@ button:focus-visible{outline:3px solid rgba(217,137,143,.45);outline-offset:2px}
 .fishing-rod{position:absolute;left:133px;bottom:128px;width:205px;height:130px;z-index:4;transform-origin:left bottom}.rod-stick{position:absolute;left:0;bottom:0;width:190px;height:5px;background:#6d4a38;border-radius:99px;transform:rotate(-31deg);transform-origin:left center}.fishing-line{position:absolute;left:164px;top:28px;width:1px;height:126px;background:rgba(74,68,61,.62);opacity:0;transition:.25s}.bobber{position:absolute;left:309px;top:51px;width:15px;height:20px;border-radius:50% 50% 42% 42%;background:linear-gradient(#ef6e67 0 48%,#fff 48%);box-shadow:0 2px 4px rgba(60,65,63,.2);opacity:0;transition:.25s;z-index:3}.lake-scene.line-out .fishing-line,.lake-scene.line-out .bobber{opacity:1}.lake-scene.line-out .fishing-rod{animation:rodSet .45s ease}.lake-scene.fish-biting .bobber{animation:bobberBite .45s ease-in-out infinite}@keyframes rodSet{45%{transform:rotate(-7deg)}}@keyframes bobberBite{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
 .fishing-status-card{background:var(--paper);border-radius:22px;padding:14px;box-shadow:0 6px 17px var(--shadow);margin-bottom:10px}.fishing-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}.fishing-stats div{text-align:center;background:#f4eadf;border-radius:13px;padding:8px 4px}.fishing-stats span{display:block;font-size:10px;color:var(--muted);font-weight:700}.fishing-stats strong{display:block;margin-top:2px;font-size:15px}.fishing-message{min-height:38px;text-align:center;color:var(--muted);font-size:12px;line-height:1.35;padding:2px 8px 9px}.fishing-action{width:100%;border:0;border-radius:16px;padding:14px;background:#b9d8c8;font-weight:900;box-shadow:0 4px 0 #86b09b;cursor:pointer}.fishing-action:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 #86b09b}.fishing-action:disabled{opacity:.55}
 .last-catch{background:rgba(255,253,248,.88);border-radius:18px;padding:12px;display:grid;grid-template-columns:48px 1fr;gap:10px;align-items:center;box-shadow:0 5px 14px rgba(85,66,56,.08)}.last-catch-icon{font-size:34px;text-align:center}.last-catch strong{display:block;font-size:13px}.last-catch small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+.vacation-section-title.record-title{margin-top:13px}.fish-records{display:flex;flex-direction:column;gap:7px}.fish-record{background:rgba(255,253,248,.88);border-radius:15px;padding:9px 11px;display:grid;grid-template-columns:26px 35px 1fr;gap:8px;align-items:center;box-shadow:0 4px 12px rgba(85,66,56,.07)}.fish-record.empty{opacity:.58}.record-rank{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#f1dfad;color:#725b3f;font-size:11px;font-weight:900}.fish-record:nth-child(1) .record-rank{background:#f4cf64}.fish-record:nth-child(2) .record-rank{background:#d9dde2}.fish-record:nth-child(3) .record-rank{background:#d7ad84}.record-fish{font-size:25px;text-align:center}.fish-record strong{display:block;font-size:12px}.fish-record small{display:block;margin-top:2px;color:var(--muted);font-size:10px;font-weight:800}
 .vacation-section-title{font-size:14px;margin:15px 4px 8px}.vacation-section-title.bait-title{margin-top:13px}.tackle-shop{display:flex;flex-direction:column;gap:8px}.tackle-card{background:var(--paper);border-radius:18px;padding:11px;display:grid;grid-template-columns:46px 1fr auto;gap:9px;align-items:center;box-shadow:0 4px 13px var(--shadow)}.tackle-icon{width:46px;height:46px;border-radius:14px;background:#eef3e7;display:grid;place-items:center;font-size:25px}.tackle-copy strong{display:block;font-size:13px}.tackle-copy small{display:block;margin-top:3px;color:var(--muted);font-size:10px;line-height:1.3}.tackle-buy{border:0;border-radius:12px;padding:9px 10px;background:#fff0be;font-size:11px;font-weight:900;min-width:60px}.tackle-buy:disabled{background:#e5e1da;color:#999}
 .bait-shop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bait-buy{border:0;border-radius:15px;background:var(--paper);padding:11px 5px;box-shadow:0 4px 13px var(--shadow)}.bait-buy strong{display:block;font-size:16px}.bait-buy span{display:block;margin-top:3px;font-size:10px;color:#9e7b43;font-weight:800}
 @media(max-width:380px){.bottom-nav{padding-left:4px;padding-right:4px}.nav-btn{font-size:8.5px}.nav-btn span{font-size:19px}.lake-scene{height:282px}.fishing-cat{left:31px}.fishing-rod{left:118px}.bobber{left:280px}.tackle-card{grid-template-columns:42px 1fr auto}.tackle-icon{width:42px;height:42px}}
@@ -207,7 +208,7 @@ button,.nav-btn,.recipe-card,.ingredient-btn,.topping-btn,.shop-buy,.slot-bet,.s
   .window{top:12px;height:108px}.shelf{top:30px}
   .customer-card{top:148px;height:118px}
   .customer-card .customer{transform:scale(.86);transform-origin:left center;margin-right:-7px}
-  .counter{height:158px}.baker-wrap{bottom:76px}
+  .counter{height:158px}.baker-wrap{bottom:72px}
   .stage{padding-top:8px}.section-title{margin-top:2px;margin-bottom:10px}
 }
 
@@ -219,3 +220,46 @@ button,.nav-btn,.recipe-card,.ingredient-btn,.topping-btn,.shop-buy,.slot-bet,.s
   .window{left:14px;width:105px;height:100px}.shelf{right:14px;top:22px}
   .counter{height:145px}
 }
+
+/* Vacation Lake scroll container: keeps the full fishing/tackle area reachable on short desktop windows. */
+#vacation-screen.active{
+  height:var(--app-height);
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+}
+#vacation-screen .vacation-wrap{
+  min-height:calc(var(--app-height) - 78px);
+  overflow-x:hidden;
+  overflow-y:visible;
+}
+@media (pointer:fine){
+  #vacation-screen.active{overflow-y:scroll}
+}
+
+/* Pantry, ingredient quality, and bake quality */
+#shop-tabs{overflow-x:auto;scrollbar-width:none;justify-content:flex-start}
+#shop-tabs::-webkit-scrollbar{display:none}
+#shop-tabs .tab{min-width:78px;flex:1 0 78px}
+.supply-choice-summary{margin:2px 16px 12px;padding:12px 14px;border-radius:18px;background:var(--paper);box-shadow:0 5px 14px var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.supply-choice-summary strong{font-size:14px}.supply-choice-summary span{font-size:11px;color:var(--muted);text-align:right}
+.supply-choice-grid{padding:0 16px 12px;display:flex;flex-direction:column;gap:9px}
+.supply-choice{width:100%;border:0;border-radius:19px;background:var(--paper);box-shadow:0 5px 14px var(--shadow);padding:12px;display:grid;grid-template-columns:48px 1fr;gap:11px;align-items:center;text-align:left;cursor:pointer}
+.supply-choice:active{transform:scale(.99)}.supply-choice.empty{opacity:.48;box-shadow:none}.supply-choice-icon{width:48px;height:48px;border-radius:15px;background:#f7eadc;display:grid;place-items:center;font-size:27px}
+.supply-choice-copy{min-width:0}.supply-choice-copy strong{display:block;font-size:14px}.supply-choice-copy small{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.3}
+.secondary-btn{display:block;margin:2px auto 90px;border:0;border-radius:16px;padding:12px 18px;background:#eadfd7;color:var(--ink);font-weight:800;box-shadow:0 4px 10px var(--shadow)}
+.pantry-clerk-card{position:relative;min-height:154px;border-radius:24px;background:linear-gradient(135deg,#f7e4c8,#f0cfb0);box-shadow:0 7px 18px var(--shadow);padding:18px 122px 18px 18px;overflow:hidden}
+.pantry-clerk-copy strong{display:block;font-size:20px}.pantry-clerk-copy small{display:block;margin-top:6px;color:var(--muted);font-size:12px;line-height:1.35}
+.clerk-cat{position:absolute;right:18px;top:30px;width:86px;height:77px;border:0;border-radius:47% 47% 44% 44%;background:#b88763;box-shadow:inset 0 -6px 0 rgba(70,47,38,.08),0 5px 12px rgba(83,56,45,.15);cursor:pointer}
+.clerk-cat:active{transform:translateY(3px) scale(.97)}
+.clerk-ear{position:absolute;top:-14px;width:34px;height:38px;background:#b88763;clip-path:polygon(50% 0,100% 100%,0 100%)}.clerk-ear.left{left:5px;transform:rotate(-9deg)}.clerk-ear.right{right:5px;transform:rotate(9deg)}
+.clerk-face{position:absolute;left:0;right:0;top:29px;text-align:center;font-weight:900;font-size:17px;letter-spacing:4px;color:#59433b}.clerk-pat-count{position:absolute;right:22px;bottom:9px;font-size:10px;color:#866b60;font-weight:700}
+.pantry-free{background:var(--mint)}.pantry-item .shop-buy small{font-size:9px;font-weight:700}
+.quality-guide{background:var(--paper);border-radius:20px;padding:14px;box-shadow:0 5px 14px var(--shadow)}.quality-guide>strong{display:block;font-size:15px}.quality-guide>small{display:block;color:var(--muted);font-size:11px;line-height:1.35;margin:3px 0 11px}.quality-guide-row{display:flex;flex-wrap:wrap;gap:6px}
+.quality-dot,.quality-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:900;letter-spacing:.2px;border:1px solid rgba(89,67,58,.12)}
+.quality-homey{background:#eee5dc;color:#756159}.quality-cozy{background:#dcead8;color:#59745c}.quality-fancy{background:#d9e7f4;color:#526e89}.quality-purrfect{background:#eadcf4;color:#765989}.quality-cats-meow{background:#fff0b8;color:#8a6421;box-shadow:0 0 0 2px rgba(224,177,73,.08)}
+.quality-badge{margin:0 auto 7px;width:max-content;padding:6px 13px;font-size:11px}
+@media(max-width:410px){#shop-tabs .tab{min-width:70px;flex-basis:70px;font-size:10px}.pantry-clerk-card{padding-right:108px}.clerk-cat{right:12px;transform:scale(.92);transform-origin:center}.clerk-cat:active{transform:scale(.89) translateY(3px)}}

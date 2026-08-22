@@ -63,6 +63,21 @@
     { level:5, name:'Dream Kitchen', price:1200, multiplier:1.75, desc:'The coziest little professional kitchen.' }
   ];
 
+  const ingredientGrades = [
+    { id:'pantry', name:'Pantry Basics', emoji:'🥣', price:0, pack:5, payout:1.00, friendship:1, qualityBonus:0, desc:'Simple everyday ingredients. Pat Biscuit for a free basket.' },
+    { id:'fresh', name:'Fresh Market', emoji:'🌾', price:12, pack:4, payout:1.12, friendship:1, qualityBonus:10, desc:'Fresh milk, butter and flour. A small step up.' },
+    { id:'choice', name:"Baker's Choice", emoji:'🧈', price:28, pack:4, payout:1.30, friendship:2, qualityBonus:24, desc:'Reliable bakery-grade ingredients.' },
+    { id:'clover', name:'Cream & Clover', emoji:'🍓', price:60, pack:4, payout:1.60, friendship:2, qualityBonus:38, desc:'Rich cream, fragrant fruit and very good butter.' },
+    { id:'moonlit', name:'Moonlit Reserve', emoji:'✨', price:100, pack:4, payout:2.00, friendship:3, qualityBonus:50, desc:'Ridiculously fancy ingredients for special bakes.' }
+  ];
+  const bakeQualities = [
+    { id:'homey', name:'Homey', min:0, multiplier:1.00 },
+    { id:'cozy', name:'Cozy', min:65, multiplier:1.08 },
+    { id:'fancy', name:'Fancy', min:82, multiplier:1.18 },
+    { id:'purrfect', name:'Purrfect', min:94, multiplier:1.35 },
+    { id:'cats-meow', name:"Cat's Meow", min:108, multiplier:1.65 }
+  ];
+
   const slotSymbols = [
     { emoji:'🐾', weight:30, multiplier:2 },
     { emoji:'🍪', weight:24, multiplier:3 },
@@ -89,13 +104,13 @@
     { level:5, name:'Golden Reel', price:1400, multiplier:2.00, wait:1400 }
   ];
   const fishTable = [
-    { id:'minnow', name:'Pond Minnow', emoji:'🐟', value:8, weight:38, tier:0 },
-    { id:'bluegill', name:'Bluegill', emoji:'🐠', value:12, weight:28, tier:1 },
-    { id:'perch', name:'Sunny Perch', emoji:'🐟', value:18, weight:18, tier:1 },
-    { id:'bass', name:'Lake Bass', emoji:'🐟', value:28, weight:12, tier:2 },
-    { id:'trout', name:'Rainbow Trout', emoji:'🐟', value:45, weight:7, tier:3 },
-    { id:'koi', name:'Vacation Koi', emoji:'🐠', value:75, weight:3, tier:4 },
-    { id:'golden', name:'Golden Fish', emoji:'✨', value:150, weight:1, tier:5 }
+    { id:'minnow', name:'Pond Minnow', emoji:'🐟', value:8, weight:38, tier:0, minLb:0.10, maxLb:0.45 },
+    { id:'bluegill', name:'Bluegill', emoji:'🐠', value:12, weight:28, tier:1, minLb:0.30, maxLb:1.25 },
+    { id:'perch', name:'Sunny Perch', emoji:'🐟', value:18, weight:18, tier:1, minLb:0.55, maxLb:1.90 },
+    { id:'bass', name:'Lake Bass', emoji:'🐟', value:28, weight:12, tier:2, minLb:1.50, maxLb:8.50 },
+    { id:'trout', name:'Rainbow Trout', emoji:'🐟', value:45, weight:7, tier:3, minLb:1.25, maxLb:10.50 },
+    { id:'koi', name:'Vacation Koi', emoji:'🐠', value:75, weight:3, tier:4, minLb:2.50, maxLb:16.00 },
+    { id:'golden', name:'Golden Fish', emoji:'✨', value:150, weight:1, tier:5, minLb:5.00, maxLb:25.00 }
   ];
 
   const toppings = ['🍓','✨','🌸','🍫','🫐','🤍'];
@@ -106,11 +121,15 @@
     memories:[], sound:true, currentCat:'mochi', slotBet:5, slotSpins:0, slotWon:0,
     slotLast:['🐾','🍪','🍓'], slotLastPayout:0, slotLastBet:5,
     bait:5, fishingRodLevel:1, fishingReelLevel:1, fishCaught:0,
-    fishingLast:null, fishingEarned:0
+    fishingLast:null, fishingEarned:0, fishRecords:[],
+    ingredientStock:{pantry:5,fresh:0,choice:0,clover:0,moonlit:0}, lastIngredientGrade:'pantry',
+    qualityCounts:{homey:0,cozy:0,fancy:0,purrfect:0,'cats-meow':0}, clerkPats:0
   });
 
   let state = load();
   let selectedRecipe = null;
+  let selectedIngredientGrade = ingredientGrades.find(g=>g.id===state.lastIngredientGrade) || ingredientGrades[0];
+  let currentBakeQuality = bakeQualities[0];
   let currentCat = cats.find(c => c.id === state.currentCat) || cats[0];
   let addedIngredients = new Set();
   let mixValue = 0;
@@ -136,7 +155,10 @@
   function load(){
     try {
       const parsed = JSON.parse(localStorage.getItem(saveKey));
-      return Object.assign(fresh(), parsed || {});
+      const next = Object.assign(fresh(), parsed || {});
+      next.ingredientStock = Object.assign(fresh().ingredientStock, parsed?.ingredientStock || {});
+      next.qualityCounts = Object.assign(fresh().qualityCounts, parsed?.qualityCounts || {});
+      return next;
     } catch { return fresh(); }
   }
   function save(){ localStorage.setItem(saveKey, JSON.stringify(state)); updateAll(); }
@@ -146,6 +168,14 @@
   function equipmentMultiplier(){ return equipmentInfo().multiplier; }
   function equipmentBonusPercent(){ return Math.round((equipmentMultiplier()-1)*100); }
   function baseRecipePayout(recipe){ return Math.round(recipe.reward*equipmentMultiplier()); }
+  function ingredientGrade(id=state.lastIngredientGrade){ return ingredientGrades.find(g=>g.id===id) || ingredientGrades[0]; }
+  function ingredientStock(id){ return Math.max(0,Number(state.ingredientStock?.[id]||0)); }
+  function rollBakeQuality(grade){
+    const score=Math.random()*100+grade.qualityBonus;
+    let quality=bakeQualities[0];
+    for(const q of bakeQualities) if(score>=q.min) quality=q;
+    return quality;
+  }
   function ding(type='soft'){
     if(!state.sound) return;
     try{
@@ -202,7 +232,7 @@
   $('#bake-back').addEventListener('click',()=>{ stopOven(); showScreen('bakery-screen'); });
 
   function startBake(){
-    selectedRecipe=null; chosenToppings=[]; addedIngredients.clear(); mixValue=0; ovenValue=0; kneadValue=0; pressValue=0;
+    selectedRecipe=null; selectedIngredientGrade=ingredientGrade(); currentBakeQuality=bakeQualities[0]; chosenToppings=[]; addedIngredients.clear(); mixValue=0; ovenValue=0; kneadValue=0; pressValue=0;
     showScreen('bake-screen'); showStage('recipe-stage'); renderRecipes();
   }
   function showStage(id){ $$('.stage').forEach(s=>s.classList.toggle('active-stage',s.id===id)); window.scrollTo(0,0); }
@@ -226,11 +256,40 @@
     $$('.recipe-card').forEach(btn=>btn.addEventListener('click',()=>{
       const r=recipes.find(x=>x.id===btn.dataset.recipe);
       if(!state.unlockedRecipes.includes(r.id)){ toast('That recipe is still tucked away'); return; }
-      selectedRecipe=r; ding(); prepareIngredients();
+      selectedRecipe=r; ding(); prepareSupplies();
     }));
   }
+  function prepareSupplies(){
+    $('#bake-title').textContent=selectedRecipe.name;
+    $('#bake-subtitle').textContent='Choose ingredient quality';
+    const summary=$('#supply-choice-summary');
+    if(summary) summary.innerHTML=`<strong>${selectedRecipe.emoji} ${selectedRecipe.name}</strong><span>One basket is used per bake.</span>`;
+    const grid=$('#supply-choice-grid');
+    grid.innerHTML=ingredientGrades.map(g=>{
+      const stock=ingredientStock(g.id);
+      const disabled=stock<=0;
+      return `<button class="supply-choice ${disabled?'empty':''}" data-grade="${g.id}" ${disabled?'disabled':''}>
+        <span class="supply-choice-icon">${g.emoji}</span>
+        <span class="supply-choice-copy"><strong>${g.name}</strong><small>${stock} bake${stock===1?'':'s'} left · Quality +${g.qualityBonus} · ×${g.payout.toFixed(2)} coins · ♥ +${g.friendship}</small></span>
+      </button>`;
+    }).join('');
+    $$('.supply-choice',grid).forEach(btn=>btn.addEventListener('click',()=>{
+      const grade=ingredientGrade(btn.dataset.grade);
+      if(ingredientStock(grade.id)<=0){toast('That basket is empty');return;}
+      selectedIngredientGrade=grade; state.lastIngredientGrade=grade.id; ding(); prepareIngredients();
+    }));
+    showStage('supplies-stage');
+  }
+  $('#pantry-shortcut').addEventListener('click',()=>{
+    activeShopTab='pantry';
+    $$('#shop-tabs .tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='pantry'));
+    showScreen('shop-screen'); renderShop();
+  });
+
   function prepareIngredients(){
     $('#bake-title').textContent=selectedRecipe.name; setStepSubtitle('ingredients');
+    const ingredientHeading=$('#ingredient-stage .section-title p');
+    if(ingredientHeading) ingredientHeading.textContent=`Using ${selectedIngredientGrade.name}. Tap each one into the bowl.`;
     addedIngredients.clear(); $('#ingredient-bowl').classList.remove('full');
     $('#ingredient-grid').innerHTML=selectedRecipe.ingredients.map(([name,emoji],i)=>`<button class="ingredient-btn" data-i="${i}"><span>${emoji}</span>${name}</button>`).join('');
     $$('.ingredient-btn').forEach(btn=>btn.addEventListener('click',()=>addIngredient(btn)));
@@ -319,16 +378,26 @@
   }
   $('#serve-btn').addEventListener('click',serve);
   function serve(){
+    const grade=selectedIngredientGrade || ingredientGrade();
+    if(ingredientStock(grade.id)<=0){ toast('That ingredient basket is empty'); prepareSupplies(); return; }
+    state.ingredientStock[grade.id]=ingredientStock(grade.id)-1;
+    currentBakeQuality=rollBakeQuality(grade);
     const favorite=selectedRecipe.id===currentCat.favorite;
     const bonus=favorite?4:0, decorBonus=Math.min(3,Math.floor(chosenToppings.length/3));
     const rawReward=selectedRecipe.reward+bonus+decorBonus;
-    const reward=Math.round(rawReward*equipmentMultiplier());
+    const reward=Math.max(1,Math.round(rawReward*equipmentMultiplier()*grade.payout*currentBakeQuality.multiplier));
+    const oldFriendship=clamp(state.friendships[currentCat.id]||0,0,5);
+    const friendshipGain=Math.min(grade.friendship,5-oldFriendship);
     state.coins+=reward; state.totalBakes++; state.bakes[selectedRecipe.id]=(state.bakes[selectedRecipe.id]||0)+1;
-    state.friendships[currentCat.id]=clamp((state.friendships[currentCat.id]||0)+1,0,5);
-    state.memories.unshift({recipe:selectedRecipe.id,cat:currentCat.id,toppings:chosenToppings.slice(0,4),when:Date.now()}); state.memories=state.memories.slice(0,18);
+    state.friendships[currentCat.id]=clamp(oldFriendship+friendshipGain,0,5);
+    state.qualityCounts[currentBakeQuality.id]=(state.qualityCounts[currentBakeQuality.id]||0)+1;
+    state.memories.unshift({recipe:selectedRecipe.id,cat:currentCat.id,toppings:chosenToppings.slice(0,4),when:Date.now(),quality:currentBakeQuality.id,ingredients:grade.id}); state.memories=state.memories.slice(0,18);
     $('#result-pastry').textContent=selectedRecipe.emoji; $('#result-title').textContent=`${currentCat.name} loved it!`;
-    $('#result-note').textContent=favorite?`${selectedRecipe.name} is ${currentCat.name}'s favorite.`:(chosenToppings.length?`${selectedRecipe.note} And very nicely decorated.`:selectedRecipe.note);
-    $('#reward-coins').textContent=`+${reward}`; $('#heart-reward').textContent=(state.friendships[currentCat.id]>=5)?'♥ best bakery friend':'♥ friendship +1';
+    const qbadge=$('#quality-badge'); qbadge.textContent=currentBakeQuality.name; qbadge.className=`quality-badge quality-${currentBakeQuality.id}`;
+    const favoriteText=favorite?`${selectedRecipe.name} is ${currentCat.name}'s favorite.`:selectedRecipe.note;
+    $('#result-note').textContent=`${favoriteText} ${grade.name} made this a ${currentBakeQuality.name.toLowerCase()} bake.`;
+    $('#reward-coins').textContent=`+${reward}`;
+    $('#heart-reward').textContent=(state.friendships[currentCat.id]>=5)?(friendshipGain?`♥ best bakery friend · +${friendshipGain}`:'♥ best bakery friend'):`♥ friendship +${friendshipGain}`;
     setCatVisual($('#result-cat'),currentCat); save(); ding('coin'); showStage('result-stage');
   }
   $('#done-btn').addEventListener('click',()=>{
@@ -339,6 +408,27 @@
   $$('#shop-tabs .tab').forEach(tab=>tab.addEventListener('click',()=>{activeShopTab=tab.dataset.tab;$$('#shop-tabs .tab').forEach(t=>t.classList.toggle('active',t===tab));renderShop();}));
   function renderShop(){
     const list=$('#shop-list'); if(!list)return;
+    if(activeShopTab==='pantry'){
+      list.innerHTML=`
+        <div class="pantry-clerk-card">
+          <div class="pantry-clerk-copy"><strong>Biscuit's Pantry</strong><small>Pat Biscuit's head for ${ingredientGrades[0].pack} free Pantry Basics baskets.</small></div>
+          <button class="clerk-cat" id="clerk-cat" aria-label="Pat Biscuit the shop cat"><span class="clerk-ear left"></span><span class="clerk-ear right"></span><span class="clerk-face">• ᴗ •</span></button>
+          <div class="clerk-pat-count">Pats: ${state.clerkPats||0}</div>
+        </div>
+        ${ingredientGrades.map(g=>{
+          const stock=ingredientStock(g.id);
+          if(g.id==='pantry') return `<div class="shop-item pantry-item"><div class="shop-icon">${g.emoji}</div><div class="shop-text"><strong>${g.name}</strong><small>${g.desc} Stock: ${stock} bakes.</small></div><button class="shop-buy pantry-free" id="free-pantry-btn">Pat</button></div>`;
+          return `<div class="shop-item pantry-item"><div class="shop-icon">${g.emoji}</div><div class="shop-text"><strong>${g.name}</strong><small>${g.desc} Quality +${g.qualityBonus} · +${Math.round((g.payout-1)*100)}% payout · ♥ ${g.friendship}. Stock: ${stock}.</small></div><button class="shop-buy" data-kind="ingredients" data-id="${g.id}">● ${g.price}<br><small>×${g.pack}</small></button></div>`;
+        }).join('')}
+        <div class="quality-guide">
+          <strong>Bake quality</strong><small>Better ingredients push your bake toward rarer results. Quality adds another coin bonus.</small>
+          <div class="quality-guide-row"><span class="quality-dot quality-homey">Homey</span><span class="quality-dot quality-cozy">Cozy</span><span class="quality-dot quality-fancy">Fancy</span><span class="quality-dot quality-purrfect">Purrfect</span><span class="quality-dot quality-cats-meow">Cat's Meow</span></div>
+        </div>`;
+      const pat=()=>{state.ingredientStock.pantry=ingredientStock('pantry')+ingredientGrades[0].pack;state.clerkPats=(state.clerkPats||0)+1;save();ding('heart');toast(`Biscuit gave you ${ingredientGrades[0].pack} basic baskets`);};
+      $('#clerk-cat')?.addEventListener('click',pat); $('#free-pantry-btn')?.addEventListener('click',pat);
+      $$('.shop-buy[data-kind="ingredients"]',list).forEach(btn=>btn.addEventListener('click',()=>buyOrEquip(btn.dataset.kind,btn.dataset.id)));
+      return;
+    }
     if(activeShopTab==='equipment'){
       const current=equipmentInfo();
       const next=equipmentLevels.find(e=>e.level===current.level+1);
@@ -374,17 +464,23 @@
       item=equipmentLevels.find(x=>x.level===Number(id));
       if(!item || item.level!==equipmentInfo().level+1){toast('Upgrade one level at a time');return;}
     }
+    if(kind==='ingredients'){
+      item=ingredientGrades.find(x=>x.id===id);
+      if(!item || item.price<=0){toast('Pat Biscuit for the free ingredients');return;}
+    }
     if(kind==='recipe'){item=recipes.find(x=>x.id===id);owned=state.unlockedRecipes.includes(id);if(owned){toast('Already in your recipe book');return;}}
     if(kind==='accessory'){item=accessories.find(x=>x.id===id);owned=state.ownedAccessories.includes(id);if(owned){state.equippedAccessory=id;save();ding();toast('Outfit updated');return;}}
     if(kind==='decor'){item=decor.find(x=>x.id===id);owned=state.ownedDecor.includes(id);if(owned){state.equippedDecor=id;save();ding();toast('Bakery redecorated');return;}}
     if(state.coins<item.price){toast('A few more bakes will do it');return;}
     state.coins-=item.price;
+    if(kind==='ingredients')state.ingredientStock[id]=ingredientStock(id)+item.pack;
     if(kind==='recipe')state.unlockedRecipes.push(id);
     if(kind==='accessory'){state.ownedAccessories.push(id);state.equippedAccessory=id;}
     if(kind==='decor'){state.ownedDecor.push(id);state.equippedDecor=id;}
     if(kind==='equipment')state.equipmentLevel=item.level;
     save(); ding('coin');
     if(kind==='equipment')toast(`Equipment Level ${item.level} · +${Math.round((item.multiplier-1)*100)}% coins`);
+    else if(kind==='ingredients')toast(`${item.name} ×${item.pack} added to the pantry`);
     else toast(kind==='recipe'?'New recipe unlocked!':'New cozy thing unlocked!');
   }
 
@@ -477,6 +573,23 @@
 
   function fishingRodInfo(){ return fishingRods.find(x=>x.level===Number(state.fishingRodLevel)) || fishingRods[0]; }
   function fishingReelInfo(){ return fishingReels.find(x=>x.level===Number(state.fishingReelLevel)) || fishingReels[0]; }
+  function rollFishSize(fish){
+    const min=Number(fish.minLb)||0.1, max=Math.max(min,Number(fish.maxLb)||min);
+    return Math.round((min+Math.random()*(max-min))*100)/100;
+  }
+  function formatFishSize(lb){
+    const n=Number(lb)||0;
+    return n<1?`${Math.max(1,Math.round(n*16))} oz`:`${n.toFixed(2)} lb`;
+  }
+  function recordFish(caught,sizeLb){
+    const entry={id:caught.id,name:caught.name,emoji:caught.emoji,sizeLb:Number(sizeLb),when:Date.now()};
+    const records=Array.isArray(state.fishRecords)?state.fishRecords.slice():[];
+    records.push(entry);
+    records.sort((a,b)=>(Number(b.sizeLb)||0)-(Number(a.sizeLb)||0));
+    const placed=records.indexOf(entry);
+    state.fishRecords=records.slice(0,3);
+    return placed>=0&&placed<3?placed+1:0;
+  }
   function rollFish(){
     const maxTier=fishingRodInfo().maxTier;
     const pool=fishTable.filter(f=>f.tier<=maxTier);
@@ -517,9 +630,19 @@
     if(last){
       $('#last-catch-icon').textContent=last.emoji||'🐟';
       $('#last-catch-name').textContent=last.name||'Fish';
-      $('#last-catch-note').textContent=`Last catch · +${formatCoins(last.payout||0)} coins · ${formatCoins(state.fishCaught||0)} caught total`;
+      const sizeNote=Number(last.sizeLb)>0?` · ${formatFishSize(last.sizeLb)}`:'';
+      $('#last-catch-note').textContent=`Last catch${sizeNote} · +${formatCoins(last.payout||0)} coins · ${formatCoins(state.fishCaught||0)} caught total`;
     }else{
       $('#last-catch-icon').textContent='🐟'; $('#last-catch-name').textContent='No catches yet'; $('#last-catch-note').textContent='There is plenty of time.';
+    }
+    const board=$('#fish-records');
+    if(board){
+      const records=Array.isArray(state.fishRecords)?state.fishRecords.slice(0,3):[];
+      board.innerHTML=Array.from({length:3},(_,i)=>{
+        const r=records[i];
+        if(!r)return `<div class="fish-record empty"><span class="record-rank">${i+1}</span><span class="record-fish">—</span><div><strong>Waiting for a catch</strong><small>No record yet</small></div></div>`;
+        return `<div class="fish-record"><span class="record-rank">${i+1}</span><span class="record-fish">${r.emoji||'🐟'}</span><div><strong>${r.name||'Fish'}</strong><small>${formatFishSize(r.sizeLb)}</small></div></div>`;
+      }).join('');
     }
   }
   $('#fishing-action')?.addEventListener('click',()=>{
@@ -538,10 +661,14 @@
     if(fishingState!=='ready'||!pendingCatch)return;
     const reel=fishingReelInfo();
     const payout=Math.max(1,Math.round(pendingCatch.value*reel.multiplier));
+    const caught=pendingCatch;
+    const sizeLb=rollFishSize(caught);
     state.coins+=payout; state.fishCaught=(state.fishCaught||0)+1; state.fishingEarned=(state.fishingEarned||0)+payout;
-    state.fishingLast={id:pendingCatch.id,name:pendingCatch.name,emoji:pendingCatch.emoji,payout,when:Date.now()};
-    const caught=pendingCatch; pendingCatch=null; fishingState='idle';
-    save(); ding('coin'); toast(`${caught.name} · +${formatCoins(payout)} coins`);
+    state.fishingLast={id:caught.id,name:caught.name,emoji:caught.emoji,payout,sizeLb,when:Date.now()};
+    const recordPlace=recordFish(caught,sizeLb);
+    pendingCatch=null; fishingState='idle';
+    save(); ding(recordPlace===1?'heart':'coin');
+    toast(recordPlace?`#${recordPlace} lake record · ${formatFishSize(sizeLb)}`:`${caught.name} · ${formatFishSize(sizeLb)} · +${formatCoins(payout)}`);
   }
   $('#rod-upgrade')?.addEventListener('click',()=>{
     const current=fishingRodInfo(), next=fishingRods.find(x=>x.level===current.level+1);
@@ -645,7 +772,8 @@
     const byRecipe=recipes.filter(r=>state.bakes[r.id]).map(r=>({r,count:state.bakes[r.id]}));
     list.innerHTML=byRecipe.map(({r,count})=>{
       const last=state.memories.find(m=>m.recipe===r.id),cat=cats.find(c=>c.id===last?.cat);
-      return `<div class="memory-card"><div class="memoji">${r.emoji}</div><div><strong>${r.name}</strong><small>${cat?`Last served to ${cat.name}`:'A bakery favorite'}${last?.toppings?.length?` · ${last.toppings.join(' ')}`:''}</small></div><div class="memory-count">×${count}</div></div>`;
+      const q=bakeQualities.find(x=>x.id===last?.quality);
+      return `<div class="memory-card"><div class="memoji">${r.emoji}</div><div><strong>${r.name}</strong><small>${cat?`Last served to ${cat.name}`:'A bakery favorite'}${q?` · ${q.name}`:''}${last?.toppings?.length?` · ${last.toppings.join(' ')}`:''}</small></div><div class="memory-count">×${count}</div></div>`;
     }).join('');
   }
   $('#reset-btn').addEventListener('click',()=>{
