@@ -48,6 +48,9 @@
         <div class="counter">
           <div class="baker-wrap">
             <div class="accessory" id="baker-accessory"></div>
+            <div class="baker-body" aria-hidden="true">
+              <div class="baker-paw left"></div><div class="baker-paw right"></div>
+            </div>
             <div class="cat-face baker" id="baker-cat" aria-hidden="true">
               <div class="ear left"></div><div class="ear right"></div>
               <div class="inner-ear left"></div><div class="inner-ear right"></div>
@@ -56,8 +59,6 @@
               <div class="whisker w1"></div><div class="whisker w2"></div><div class="whisker w3"></div><div class="whisker w4"></div>
             </div>
           </div>
-          <div class="counter-paw cat-paw left" aria-hidden="true"></div>
-          <div class="counter-paw cat-paw right" aria-hidden="true"></div>
           <div class="pastry-display" id="pastry-display">🍪</div>
           <button class="primary-btn" id="bake-btn">Bake something</button>
         </div>
@@ -69,6 +70,7 @@
         <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
         <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
         <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="crow-screen"><span>🐦</span>Crow</button>
         <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
@@ -201,6 +203,7 @@
         <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
         <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
         <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="crow-screen"><span>🐦</span>Crow</button>
         <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
@@ -250,6 +253,7 @@
         <button class="nav-btn active" data-screen="slots-screen"><span>🎰</span>Slots</button>
         <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
         <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="crow-screen"><span>🐦</span>Crow</button>
         <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
@@ -297,25 +301,9 @@
         <h3 class="vacation-section-title record-title">Top 3 Biggest Fish</h3>
         <div class="fish-records" id="fish-records" aria-label="Top three biggest fish"></div>
 
-        <h3 class="vacation-section-title">Tackle Shop</h3>
-        <div class="tackle-shop">
-          <div class="tackle-card">
-            <div class="tackle-icon">🎣</div>
-            <div class="tackle-copy"><strong id="rod-name">Twig Rod</strong><small id="rod-desc">Better rods help you find rarer fish.</small></div>
-            <button class="tackle-buy" id="rod-upgrade">Upgrade</button>
-          </div>
-          <div class="tackle-card">
-            <div class="tackle-icon">⚙️</div>
-            <div class="tackle-copy"><strong id="reel-name">Tin Reel</strong><small id="reel-desc">Better reels improve the value of each catch.</small></div>
-            <button class="tackle-buy" id="reel-upgrade">Upgrade</button>
-          </div>
-        </div>
-
-        <h3 class="vacation-section-title bait-title">Bait</h3>
-        <div class="bait-shop">
-          <button class="bait-buy" data-bait="1" data-price="6"><strong>+1</strong><span>● 6</span></button>
-          <button class="bait-buy" data-bait="5" data-price="25"><strong>+5</strong><span>● 25</span></button>
-          <button class="bait-buy" data-bait="20" data-price="80"><strong>+20</strong><span>● 80</span></button>
+        <div class="vacation-shop-note">
+          <strong>Need more gear?</strong>
+          <small>Fishing rods, reels, and bait are now in the <b>Shop → Gear</b> section.</small>
         </div>
       </div>
 
@@ -325,6 +313,7 @@
         <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
         <button class="nav-btn active" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
         <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="crow-screen"><span>🐦</span>Crow</button>
         <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
@@ -372,6 +361,60 @@
         <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
         <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
         <button class="nav-btn active" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="crow-screen"><span>🐦</span>Crow</button>
+        <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
+      </nav>
+    </section>
+
+    <section class="screen" id="crow-screen">
+      <header class="simple-header main-subheader crow-header">
+        <div></div><div><h2>William de Crow</h2><p>A very distinguished friend</p></div>
+        <button class="icon-btn" id="crow-sound-btn" aria-label="Toggle sound">♪</button>
+      </header>
+
+      <div class="crow-wrap">
+        <div class="crow-scene" id="crow-scene">
+          <div class="crow-sky"></div>
+          <div class="crow-cloud one"></div><div class="crow-cloud two"></div>
+          <div class="crow-fence"></div>
+          <div class="crow-bench"></div>
+
+          <div class="crow-cat" id="crow-cat" aria-hidden="true">
+            <div class="crow-cat-tail"></div>
+            <div class="crow-cat-body"></div>
+            <div class="crow-cat-head">
+              <div class="crow-cat-ear left"></div><div class="crow-cat-ear right"></div>
+              <div class="crow-cat-eye left"></div><div class="crow-cat-eye right"></div>
+              <div class="crow-cat-nose"></div><div class="crow-cat-mouth"></div>
+            </div>
+          </div>
+
+          <button class="william-crow" id="william-crow" aria-label="Say hello to William de Crow">
+            <span class="william-wing"></span><span class="william-body"></span><span class="william-head"></span>
+            <span class="william-eye"></span><span class="william-beak"></span><span class="william-feet"></span>
+          </button>
+          <div class="crow-shiny" id="crow-shiny" aria-live="polite"></div>
+        </div>
+
+        <div class="crow-card">
+          <strong>William de Crow</strong>
+          <p id="crow-message">William has stopped by to spend some time with the cat.</p>
+          <div class="crow-actions">
+            <button class="crow-action" id="crow-crumb-btn">Share a crumb</button>
+            <button class="crow-action" id="crow-shiny-btn">Ask about shinies</button>
+            <button class="crow-action dance-action" id="crow-dance-btn">Dance</button>
+          </div>
+          <small>Tap William. Mostly jokes. Occasionally, statistics.</small>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
+        <button class="nav-btn" data-screen="shop-screen"><span>🛍️</span>Shop</button>
+        <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
+        <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
+        <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn active" data-screen="crow-screen"><span>🐦</span>Crow</button>
         <button class="nav-btn" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>
@@ -386,6 +429,18 @@
         <div><strong id="known-recipes">1</strong><span>recipes</span></div>
         <div><strong id="cat-friends">0</strong><span>cat friends</span></div>
       </div>
+      <section class="adventure-records" aria-label="Other adventure records">
+        <h3>Other adventures</h3>
+        <div class="adventure-stat-grid">
+          <div class="adventure-stat"><span>🎰</span><strong id="book-slot-spins">0</strong><small>slots played</small></div>
+          <div class="adventure-stat"><span>✨</span><strong id="book-slot-wins">0</strong><small>slot wins</small></div>
+          <div class="adventure-stat"><span>🎣</span><strong id="book-fish-caught">0</strong><small>fish caught</small></div>
+          <div class="adventure-stat"><span>🍞</span><strong id="book-william-given">0</strong><small>items given to William</small></div>
+          <div class="adventure-stat"><span>💎</span><strong id="book-william-received">0</strong><small>items from William</small></div>
+          <div class="adventure-stat"><span>🪩</span><strong id="book-dance-parties">0</strong><small>dance parties</small></div>
+          <div class="adventure-stat stats-stat"><span>📊</span><strong id="book-statistics-mentions">0</strong><small>statistics mentions</small></div>
+        </div>
+      </section>
       <div class="memory-list" id="memory-list"></div>
       <nav class="bottom-nav">
         <button class="nav-btn" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
@@ -393,6 +448,7 @@
         <button class="nav-btn" data-screen="slots-screen"><span>🎰</span>Slots</button>
         <button class="nav-btn" data-screen="vacation-screen"><span>🎣</span>Vacation</button>
         <button class="nav-btn" data-screen="relax-screen"><span>🐈</span>Relax</button>
+        <button class="nav-btn" data-screen="crow-screen"><span>🐦</span>Crow</button>
         <button class="nav-btn active" data-screen="book-screen"><span>📖</span>Book</button>
       </nav>
     </section>

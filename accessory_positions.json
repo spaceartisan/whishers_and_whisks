@@ -1,0 +1,28 @@
+{
+  "_note": "Accessory placement relative to the baker cat wrapper. Increase x to move right, y to move down, and scale to make the PNG larger. scale 1.0 = normal size, 1.5 = 50% larger, 2.0 = double size. PNG files live in assets/accessories/. Save edits and reload the page.",
+  "chef": {
+    "x": -25,
+    "y": -15,
+    "scale": 2
+  },
+  "bow": {
+    "x": 15,
+    "y": 18,
+    "scale": 2.0
+  },
+  "flower": {
+    "x": 15,
+    "y": 16,
+    "scale": 1.0
+  },
+  "glasses": {
+    "x": -32,
+    "y": 40,
+    "scale": 2.5
+  },
+  "crown": {
+    "x": 1,
+    "y": 5,
+    "scale": 2.0
+  }
+}

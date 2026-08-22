@@ -19,6 +19,7 @@
 
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const editableAssetVersion = Date.now();
 
   const recipes = [
     { id:'cookie', name:'Butter Cookie', emoji:'🍪', price:0, reward:8, steps:['ingredients','mix','bake','decorate'], ingredients:[['Flour','🌾'],['Butter','🧈'],['Sugar','🧂'],['Egg','🥚']], note:'A warm little classic.' },
@@ -39,13 +40,55 @@
   ];
 
   const accessories = [
-    { id:'none', name:'No accessory', emoji:'', price:0, desc:'Simple and comfy.' },
-    { id:'chef', name:'Tiny Chef Hat', emoji:'👨‍🍳', price:70, desc:'Official bakery business.' },
-    { id:'bow', name:'Pink Bow', emoji:'🎀', price:95, desc:'For very important baking.' },
-    { id:'flower', name:'Daisy', emoji:'🌼', price:125, desc:'Fresh from the windowsill.' },
-    { id:'glasses', name:'Round Glasses', emoji:'🤓', price:180, desc:'Serious recipe research.' },
-    { id:'crown', name:'Bakery Crown', emoji:'👑', price:300, desc:'For the ruler of pastries.' }
+    { id:'none', name:'No accessory', emoji:'', image:'', price:0, desc:'Simple and comfy.' },
+    { id:'chef', name:'Tiny Chef Hat', emoji:'👨‍🍳', image:'assets/accessories/chef.png', price:70, desc:'Official bakery business.' },
+    { id:'bow', name:'Pink Bow', emoji:'🎀', image:'assets/accessories/bow.png', price:95, desc:'For very important baking.' },
+    { id:'flower', name:'Daisy', emoji:'🌼', image:'assets/accessories/flower.png', price:125, desc:'Fresh from the windowsill.' },
+    { id:'glasses', name:'Round Glasses', emoji:'🤓', image:'assets/accessories/glasses.png', price:180, desc:'Serious recipe research.' },
+    { id:'crown', name:'Bakery Crown', emoji:'👑', image:'assets/accessories/crown.png', price:300, desc:'For the ruler of pastries.' }
   ];
+
+  const defaultAccessoryPositions = {
+    chef:{x:14,y:4,scale:1}, bow:{x:32,y:18,scale:1}, flower:{x:15,y:16,scale:1}, glasses:{x:13,y:24,scale:1}, crown:{x:24,y:16,scale:1}
+  };
+  let accessoryPositions = {...defaultAccessoryPositions};
+  const defaultBakerPawPositions = {
+    left:{x:-6,y:28}, right:{x:54,y:28}
+  };
+  let bakerPawPositions = {...defaultBakerPawPositions};
+  async function loadAccessoryPositions(){
+    try{
+      const response=await fetch('accessory_positions.json',{cache:'no-store'});
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();
+      for(const id of Object.keys(defaultAccessoryPositions)){
+        const pos=data?.[id];
+        if(pos && Number.isFinite(Number(pos.x)) && Number.isFinite(Number(pos.y))){
+          const scale=Number(pos.scale);
+          accessoryPositions[id]={x:Number(pos.x),y:Number(pos.y),scale:Number.isFinite(scale)&&scale>0?scale:1};
+        }
+      }
+      renderBakery();
+    }catch(err){
+      console.warn('Using built-in accessory positions; accessory_positions.json could not be loaded.',err);
+    }
+  }
+  async function loadBakerPawPositions(){
+    try{
+      const response=await fetch('baker_paw_positions.json',{cache:'no-store'});
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();
+      for(const id of Object.keys(defaultBakerPawPositions)){
+        const pos=data?.[id];
+        if(pos && Number.isFinite(Number(pos.x)) && Number.isFinite(Number(pos.y))){
+          bakerPawPositions[id]={x:Number(pos.x),y:Number(pos.y)};
+        }
+      }
+      renderBakery();
+    }catch(err){
+      console.warn('Using built-in baker paw positions; baker_paw_positions.json could not be loaded.',err);
+    }
+  }
 
   const decor = [
     { id:'classic', name:'Sunny Bakery', emoji:'☀️', price:0, desc:'Warm cream walls and a wooden counter.' },
@@ -118,10 +161,11 @@
   const fresh = () => ({
     coins:35, unlockedRecipes:['cookie'], ownedAccessories:['none'], equippedAccessory:'none',
     ownedDecor:['classic'], equippedDecor:'classic', equipmentLevel:1, friendships:{}, bakes:{}, totalBakes:0,
-    memories:[], sound:true, currentCat:'mochi', slotBet:5, slotSpins:0, slotWon:0,
+    memories:[], sound:true, currentCat:'mochi', slotBet:5, slotSpins:0, slotWon:0, slotWins:0,
     slotLast:['🐾','🍪','🍓'], slotLastPayout:0, slotLastBet:5,
     bait:5, fishingRodLevel:1, fishingReelLevel:1, fishCaught:0,
     fishingLast:null, fishingEarned:0, fishRecords:[],
+    williamItemsGiven:0, williamItemsReceived:0, williamDanceParties:0, williamStatisticsMentions:0,
     ingredientStock:{pantry:5,fresh:0,choice:0,clover:0,moonlit:0}, lastIngredientGrade:'pantry',
     qualityCounts:{homey:0,cozy:0,fancy:0,purrfect:0,'cats-meow':0}, clerkPats:0
   });
@@ -151,6 +195,9 @@
   let relaxLastPoint = null;
   let relaxStrokeCount = 0;
   let relaxPurr = null;
+  let crowDanceTimer = null;
+  let crowDanceBeatTimer = null;
+  let crowDanceEmojiTimer = null;
 
   function load(){
     try {
@@ -198,7 +245,7 @@
     ['#coin-count','#coin-count-bake','#coin-count-shop','#coin-count-slots','#coin-count-vacation'].forEach(id=>{ const e=$(id); if(e)e.textContent=formatCoins(state.coins); });
     $('#sound-btn').textContent=state.sound?'♪':'♩';
     currentCat = cats.find(c=>c.id===state.currentCat) || currentCat || cats[0];
-    renderBakery(); renderShop(); renderSlots(); renderVacation(); renderRelax(); renderBook();
+    renderBakery(); renderShop(); renderSlots(); renderVacation(); renderRelax(); renderCrow(); renderBook();
   }
 
   function setCatVisual(el, cat){ if(el) el.style.setProperty('--cat',cat.color); }
@@ -213,14 +260,44 @@
     const acc=accessories.find(a=>a.id===state.equippedAccessory)||accessories[0];
     const accEl=$('#baker-accessory');
     accEl.className='accessory';
-    if(acc.id!=='none') accEl.classList.add(`accessory-${acc.id}`);
-    accEl.textContent='';
+    accEl.style.left='';
+    accEl.style.top='';
+    accEl.style.transform='';
+    accEl.style.transformOrigin='';
+    accEl.innerHTML='';
+    if(acc.id!=='none'){
+      accEl.classList.add(`accessory-${acc.id}`);
+      const pos=accessoryPositions[acc.id] || defaultAccessoryPositions[acc.id];
+      if(pos){
+        accEl.style.left=`${pos.x}px`;
+        accEl.style.top=`${pos.y}px`;
+        accEl.style.transformOrigin='top left';
+        accEl.style.transform=`scale(${Number.isFinite(Number(pos.scale))&&Number(pos.scale)>0?Number(pos.scale):1})`;
+      }
+      if(acc.image){
+        const image=document.createElement('img');
+        image.src=`${acc.image}?v=${editableAssetVersion}`;
+        image.alt='';
+        image.draggable=false;
+        accEl.appendChild(image);
+      }
+    }
+    for(const side of ['left','right']){
+      const paw=$(`.baker-paw.${side}`);
+      const pos=bakerPawPositions[side] || defaultBakerPawPositions[side];
+      if(paw && pos){
+        paw.style.left=`${pos.x}px`;
+        paw.style.right='auto';
+        paw.style.top=`${pos.y}px`;
+      }
+    }
     const scene=$('#bakery-scene'); scene.className='bakery-scene'; if(state.equippedDecor!=='classic')scene.classList.add(`theme-${state.equippedDecor}`);
     const last=state.memories[0]; $('#pastry-display').textContent=last ? (recipes.find(r=>r.id===last.recipe)?.emoji || '🍪') : '🍪';
   }
 
   function showScreen(id){
     if(id!=='relax-screen') endRelaxPetting();
+    if(id!=='crow-screen') stopWilliamDance(false);
     $$('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
     window.scrollTo(0,0);
     updateAll();
@@ -433,6 +510,8 @@
       const current=equipmentInfo();
       const next=equipmentLevels.find(e=>e.level===current.level+1);
       const bonus=equipmentBonusPercent();
+      const rod=fishingRodInfo(), reel=fishingReelInfo();
+      const nextRod=fishingRods.find(x=>x.level===rod.level+1), nextReel=fishingReels.find(x=>x.level===reel.level+1);
       list.innerHTML=`
         <div class="shop-item equipment-card current-equipment">
           <div class="shop-icon">⚙️</div>
@@ -444,8 +523,31 @@
           <div class="shop-text"><strong>Upgrade to Level ${next.level}</strong><small>${next.desc} Payout becomes +${Math.round((next.multiplier-1)*100)}%.</small></div>
           <button class="shop-buy" data-kind="equipment" data-id="${next.level}">● ${next.price}</button>
         </div>`:`<div class="shop-item equipment-card max-equipment"><div class="shop-icon">✨</div><div class="shop-text"><strong>Equipment maxed</strong><small>Your bakery earns the full +${bonus}% equipment bonus.</small></div><button class="shop-buy owned" disabled>Max</button></div>`}
+        <div class="shop-section-label">Fishing Gear</div>
+        <div class="shop-item equipment-card">
+          <div class="shop-icon">🎣</div>
+          <div class="shop-text"><strong>${rod.name} · Lv. ${rod.level}</strong><small>${rod.level<5?`Can find fish up to tier ${rod.maxTier}. Better rods unlock rarer catches.`:'Every fish in the lake is now within reach.'}</small></div>
+          <button class="shop-buy ${nextRod?'':'owned'}" data-action="rod-upgrade" ${nextRod?'': 'disabled'}>${nextRod?`● ${nextRod.price}`:'Max'}</button>
+        </div>
+        <div class="shop-item equipment-card">
+          <div class="shop-icon">🧵</div>
+          <div class="shop-text"><strong>${reel.name} · Lv. ${reel.level}</strong><small>${reel.level<5?`Catch value ×${reel.multiplier.toFixed(2)}. Better reels also shorten the wait.`:`Catch value ×${reel.multiplier.toFixed(2)} with the smoothest reel.`}</small></div>
+          <button class="shop-buy ${nextReel?'':'owned'}" data-action="reel-upgrade" ${nextReel?'': 'disabled'}>${nextReel?`● ${nextReel.price}`:'Max'}</button>
+        </div>
+        <div class="shop-item equipment-card">
+          <div class="shop-icon">🪱</div>
+          <div class="shop-text"><strong>Bait Supply</strong><small>You have ${state.bait||0} bait. Pick up more before your next lake day.</small></div>
+          <div class="equipment-bait-actions">
+            <button class="shop-buy compact" data-action="buy-bait" data-bait="1" data-price="6">+1 · 6</button>
+            <button class="shop-buy compact" data-action="buy-bait" data-bait="5" data-price="25">+5 · 25</button>
+            <button class="shop-buy compact" data-action="buy-bait" data-bait="20" data-price="80">+20 · 80</button>
+          </div>
+        </div>
       `;
       $$('.shop-buy[data-kind="equipment"]',list).forEach(btn=>btn.addEventListener('click',()=>buyOrEquip(btn.dataset.kind,btn.dataset.id)));
+      $$('[data-action="rod-upgrade"]',list).forEach(btn=>btn.addEventListener('click',buyRodUpgrade));
+      $$('[data-action="reel-upgrade"]',list).forEach(btn=>btn.addEventListener('click',buyReelUpgrade));
+      $$('[data-action="buy-bait"]',list).forEach(btn=>btn.addEventListener('click',()=>buyBait(Number(btn.dataset.bait)||0, Number(btn.dataset.price)||0)));
       return;
     }
     let data=[];
@@ -454,7 +556,8 @@
     if(activeShopTab==='decor') data=decor.map(d=>({kind:'decor',...d,owned:state.ownedDecor.includes(d.id),equipped:state.equippedDecor===d.id}));
     list.innerHTML=data.map(x=>{
       const label=x.equipped?'Equipped':x.owned?(x.kind==='recipe'?'Owned':'Use'):`● ${x.price}`;
-      return `<div class="shop-item"><div class="shop-icon">${x.emoji}</div><div class="shop-text"><strong>${x.name}</strong><small>${x.desc}</small></div><button class="shop-buy ${x.equipped?'equipped':x.owned?'owned':''}" data-kind="${x.kind}" data-id="${x.id}">${label}</button></div>`;
+      const icon=x.image?`<img src="${x.image}?v=${editableAssetVersion}" alt="" draggable="false">`:x.emoji;
+      return `<div class="shop-item"><div class="shop-icon">${icon}</div><div class="shop-text"><strong>${x.name}</strong><small>${x.desc}</small></div><button class="shop-buy ${x.equipped?'equipped':x.owned?'owned':''}" data-kind="${x.kind}" data-id="${x.id}">${label}</button></div>`;
     }).join('');
     $$('.shop-buy',list).forEach(btn=>btn.addEventListener('click',()=>buyOrEquip(btn.dataset.kind,btn.dataset.id)));
   }
@@ -562,6 +665,7 @@
     state.coins+=payout;
     state.slotSpins=(state.slotSpins||0)+1;
     state.slotWon=(state.slotWon||0)+payout;
+    if(payout>bet)state.slotWins=(state.slotWins||0)+1;
     state.slotLast=final;
     state.slotLastPayout=payout;
     state.slotLastBet=bet;
@@ -603,16 +707,9 @@
     if(!bait)return;
     const rod=fishingRodInfo(), reel=fishingReelInfo();
     bait.textContent=state.bait||0;
-    $('#rod-level').textContent=`Lv. ${rod.level}`;
-    $('#reel-level').textContent=`Lv. ${reel.level}`;
-    $('#rod-name').textContent=rod.name;
-    $('#reel-name').textContent=reel.name;
-    $('#rod-desc').textContent=rod.level<5?`Can find fish up to tier ${rod.maxTier}. Better rods unlock rarer catches.`:'Every fish in the lake is now within reach.';
-    $('#reel-desc').textContent=reel.level<5?`Catch value ×${reel.multiplier.toFixed(2)}. Better reels also shorten the wait.`:`Catch value ×${reel.multiplier.toFixed(2)} with the smoothest reel.`;
-    const nextRod=fishingRods.find(x=>x.level===rod.level+1), nextReel=fishingReels.find(x=>x.level===reel.level+1);
-    const rodBtn=$('#rod-upgrade'), reelBtn=$('#reel-upgrade');
-    rodBtn.textContent=nextRod?`● ${nextRod.price}`:'Max'; rodBtn.disabled=!nextRod;
-    reelBtn.textContent=nextReel?`● ${nextReel.price}`:'Max'; reelBtn.disabled=!nextReel;
+    const rodLevelEl=$('#rod-level'), reelLevelEl=$('#reel-level');
+    if(rodLevelEl)rodLevelEl.textContent=`Lv. ${rod.level}`;
+    if(reelLevelEl)reelLevelEl.textContent=`Lv. ${reel.level}`;
     const action=$('#fishing-action'), message=$('#fishing-message'), scene=$('#lake-scene');
     scene.classList.toggle('line-out',fishingState==='waiting'||fishingState==='ready');
     scene.classList.toggle('fish-biting',fishingState==='ready');
@@ -670,28 +767,32 @@
     save(); ding(recordPlace===1?'heart':'coin');
     toast(recordPlace?`#${recordPlace} lake record · ${formatFishSize(sizeLb)}`:`${caught.name} · ${formatFishSize(sizeLb)} · +${formatCoins(payout)}`);
   }
-  $('#rod-upgrade')?.addEventListener('click',()=>{
+  function buyRodUpgrade(){
     const current=fishingRodInfo(), next=fishingRods.find(x=>x.level===current.level+1);
     if(!next)return;
     if(state.coins<next.price){toast('A few more coins will do it');return;}
     state.coins-=next.price; state.fishingRodLevel=next.level; save(); ding('coin'); toast(`${next.name} equipped`);
-  });
-  $('#reel-upgrade')?.addEventListener('click',()=>{
+  }
+  function buyReelUpgrade(){
     const current=fishingReelInfo(), next=fishingReels.find(x=>x.level===current.level+1);
     if(!next)return;
     if(state.coins<next.price){toast('A few more coins will do it');return;}
     state.coins-=next.price; state.fishingReelLevel=next.level; save(); ding('coin'); toast(`${next.name} equipped`);
-  });
-  $$('.bait-buy').forEach(btn=>btn.addEventListener('click',()=>{
-    const amount=Number(btn.dataset.bait)||0, price=Number(btn.dataset.price)||0;
+  }
+  function buyBait(amount, price){
     if(state.coins<price){toast('Not quite enough coins');return;}
     state.coins-=price; state.bait=(state.bait||0)+amount; save(); ding('coin'); toast(`+${amount} bait`);
-  }));
+  }
 
   function renderRelax(){
     const catEl=$('#relax-cat');
     if(!catEl)return;
     setCatVisual(catEl,currentCat);
+    const room=$('.relax-room');
+    if(room){
+      room.className='relax-room';
+      if(state.equippedDecor!=='classic')room.classList.add(`theme-${state.equippedDecor}`);
+    }
     const name=$('#relax-cat-name'); if(name)name.textContent=`${currentCat.name} is relaxing.`;
     const sound=$('#relax-sound-btn'); if(sound)sound.textContent=state.sound?'♪':'♩';
   }
@@ -764,9 +865,153 @@
     state.sound=!state.sound; if(!state.sound)endRelaxPetting(); save(); if(state.sound)ding('heart');
   });
 
+  const defaultCrowDialogue={
+    jokes:[
+      'William gives a dignified little caw. That was the whole joke.',
+      'William says the cookie was outstanding. It was sitting outside.',
+      'Why did William inspect the pie? Crow business.',
+      'William found a spoon. He has promoted it to treasure.',
+      'Bakery rule: never trust a quiet muffin.'
+    ],
+    statistics:[
+      'Randomize your run order. Crows hate confounding.',
+      'Standard least squares is respectable, but check your residuals.',
+      'Latin hypercube is better than I-optimal. Caw. I refuse to elaborate.'
+    ],
+    statsProbability:.05
+  };
+  let crowDialogue={...defaultCrowDialogue,jokes:[...defaultCrowDialogue.jokes],statistics:[...defaultCrowDialogue.statistics]};
+  async function loadCrowDialogue(){
+    try{
+      const response=await fetch('william_de_crow_dialogue.json',{cache:'no-store'});
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();
+      const jokes=Array.isArray(data?.jokes)?data.jokes.filter(x=>typeof x==='string'&&x.trim()):[];
+      const statistics=Array.isArray(data?.statistics)?data.statistics.filter(x=>typeof x==='string'&&x.trim()):[];
+      const p=Number(data?.stats_probability);
+      crowDialogue={
+        jokes:jokes.length?jokes:[...defaultCrowDialogue.jokes],
+        statistics:statistics.length?statistics:[...defaultCrowDialogue.statistics],
+        statsProbability:Number.isFinite(p)?clamp(p,0,1):defaultCrowDialogue.statsProbability
+      };
+    }catch(err){
+      console.warn('Using built-in William de Crow dialogue; william_de_crow_dialogue.json could not be loaded.',err);
+    }
+  }
+  function randomWilliamLine(){
+    const useStats=Math.random()<crowDialogue.statsProbability;
+    const bank=useStats?crowDialogue.statistics:crowDialogue.jokes;
+    return {text:bank[Math.floor(Math.random()*bank.length)] || defaultCrowDialogue.jokes[0],isStats:useStats};
+  }
+  const crowShinies=[
+    ['🔘','a very good button'],['🔔','a tiny bell'],['🪙','a suspiciously shiny coin'],
+    ['🥄','a miniature spoon'],['💎','a sparkly little stone'],['🔑','an old key'],['✨','something extremely shiny']
+  ];
+
+  function renderCrow(){
+    const cat=$('#crow-cat');
+    if(!cat)return;
+    setCatVisual(cat,currentCat);
+    const sound=$('#crow-sound-btn'); if(sound)sound.textContent=state.sound?'♪':'♩';
+  }
+
+  function crowChirp(){
+    if(!state.sound)return;
+    try{
+      audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==='suspended')audioCtx.resume();
+      const now=audioCtx.currentTime, osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
+      osc.type='triangle'; osc.frequency.setValueAtTime(510,now); osc.frequency.exponentialRampToValueAtTime(330,now+.1);
+      gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.035,now+.015); gain.gain.exponentialRampToValueAtTime(.0001,now+.13);
+      osc.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+.15);
+    }catch{}
+  }
+
+  function williamReact(message){
+    const crow=$('#william-crow'), msg=$('#crow-message');
+    if(crow){crow.classList.remove('hopping');void crow.offsetWidth;crow.classList.add('hopping');}
+    if(msg)msg.textContent=message;
+    crowChirp();
+  }
+
+  const danceEmojis=['✨','🎵','🎶','💖','⭐','🐾','🎉','🪩','🌟'];
+  function spawnDanceEmoji(){
+    const scene=$('#crow-scene');
+    if(!scene||!scene.classList.contains('dancing'))return;
+    const sides=Math.random()<.35?['cat','crow']:[Math.random()<.5?'cat':'crow'];
+    sides.forEach(side=>{
+      const emoji=document.createElement('span');
+      emoji.className=`dance-emoji ${side}`;
+      emoji.textContent=danceEmojis[Math.floor(Math.random()*danceEmojis.length)];
+      emoji.style.setProperty('--drift',`${Math.round((Math.random()-.5)*28)}px`);
+      emoji.style.setProperty('--tilt',`${Math.round((Math.random()-.5)*28)}deg`);
+      scene.appendChild(emoji);
+      setTimeout(()=>emoji.remove(),1800);
+    });
+  }
+
+  function stopWilliamDance(showFinished=true){
+    if(crowDanceTimer){clearTimeout(crowDanceTimer);crowDanceTimer=null;}
+    if(crowDanceBeatTimer){clearInterval(crowDanceBeatTimer);crowDanceBeatTimer=null;}
+    if(crowDanceEmojiTimer){clearInterval(crowDanceEmojiTimer);crowDanceEmojiTimer=null;}
+    const scene=$('#crow-scene'), btn=$('#crow-dance-btn'), msg=$('#crow-message');
+    if(scene){
+      scene.classList.remove('dancing');
+      $$('.dance-emoji',scene).forEach(e=>e.remove());
+    }
+    if(btn){btn.disabled=false;btn.textContent='Dance';}
+    if(showFinished&&msg)msg.textContent='William straightens his feathers. The cat pretends that was normal.';
+  }
+
+  function startWilliamDance(){
+    if(crowDanceTimer)return;
+    const scene=$('#crow-scene'), btn=$('#crow-dance-btn'), msg=$('#crow-message');
+    if(!scene||!btn)return;
+    const crow=$('#william-crow'); if(crow)crow.classList.remove('hopping');
+    state.williamDanceParties=(state.williamDanceParties||0)+1;
+    save();
+    scene.classList.add('dancing');
+    btn.disabled=true; btn.textContent='Dancing…';
+    if(msg)msg.textContent='William de Crow knows the choreography. Somehow.';
+    crowChirp();
+    spawnDanceEmoji();
+    crowDanceEmojiTimer=setInterval(spawnDanceEmoji,620);
+    crowDanceBeatTimer=setInterval(()=>{ if(state.sound)ding(Math.random()<.25?'heart':'soft'); },1500);
+    crowDanceTimer=setTimeout(()=>stopWilliamDance(true),15000);
+  }
+
+  $('#william-crow')?.addEventListener('click',()=>{
+    const line=randomWilliamLine();
+    if(line.isStats){state.williamStatisticsMentions=(state.williamStatisticsMentions||0)+1;save();}
+    williamReact(line.text);
+  });
+  $('#crow-crumb-btn')?.addEventListener('click',()=>{
+    state.williamItemsGiven=(state.williamItemsGiven||0)+1;save();
+    williamReact('William accepts one tiny crumb with impeccable manners.');
+    const shiny=$('#crow-shiny'); if(shiny){shiny.textContent='🍞';shiny.classList.remove('show');void shiny.offsetWidth;shiny.classList.add('show');}
+  });
+  $('#crow-shiny-btn')?.addEventListener('click',()=>{
+    const [icon,label]=crowShinies[Math.floor(Math.random()*crowShinies.length)];
+    state.williamItemsReceived=(state.williamItemsReceived||0)+1;save();
+    williamReact(`William proudly presents ${label}.`);
+    const shiny=$('#crow-shiny'); if(shiny){shiny.textContent=icon;shiny.classList.remove('show');void shiny.offsetWidth;shiny.classList.add('show');}
+  });
+  $('#crow-dance-btn')?.addEventListener('click',startWilliamDance);
+  $('#crow-sound-btn')?.addEventListener('click',()=>{state.sound=!state.sound;save();if(state.sound)crowChirp();});
+
   function renderBook(){
     $('#total-bakes').textContent=state.totalBakes; $('#known-recipes').textContent=state.unlockedRecipes.length;
     $('#cat-friends').textContent=Object.values(state.friendships).filter(v=>v>=5).length;
+    const adventureStats={
+      'book-slot-spins':state.slotSpins||0,
+      'book-slot-wins':state.slotWins||0,
+      'book-fish-caught':state.fishCaught||0,
+      'book-william-given':state.williamItemsGiven||0,
+      'book-william-received':state.williamItemsReceived||0,
+      'book-dance-parties':state.williamDanceParties||0,
+      'book-statistics-mentions':state.williamStatisticsMentions||0
+    };
+    Object.entries(adventureStats).forEach(([id,value])=>{const el=$(`#${id}`);if(el)el.textContent=formatCoins(value);});
     const list=$('#memory-list');
     if(!state.totalBakes){list.innerHTML='<div class="empty-memory">Your recipe book is waiting for its first cozy bake.<br><br>Nothing here can be messed up.</div>';return;}
     const byRecipe=recipes.filter(r=>state.bakes[r.id]).map(r=>({r,count:state.bakes[r.id]}));
@@ -795,4 +1040,7 @@
   };
 
   updateAll();
+  loadAccessoryPositions();
+  loadBakerPawPositions();
+  loadCrowDialogue();
 })();

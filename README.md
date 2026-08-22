@@ -51,3 +51,51 @@ The Cozy Shop now has a **Pantry** tab. Biscuit the shop cat gives free Pantry B
 
 Bake results now have five bakery-themed quality levels: **Homey**, **Cozy**, **Fancy**, **Purrfect**, and **Cat's Meow**. Higher-quality results add an additional coin multiplier and are recorded with the bake in the recipe book. Existing saves automatically receive five Pantry Basics baskets.
 
+
+## v1.15 desktop scrolling
+
+Shop and Recipe Book now use their own scrollable content areas on short desktop windows. The Shop category strip also supports horizontal scrolling and shows a thin horizontal scrollbar for mouse/desktop users while remaining swipe-friendly on phones.
+
+
+## Manual baker layout editing
+
+Accessory placement is controlled by `accessory_positions.json`. Each accessory has an `x` and `y` value in pixels relative to the baker cat wrapper:
+
+- Increase `x` to move the accessory right; decrease it to move left.
+- Increase `y` to move the accessory down; decrease it to move up.
+- Save the JSON file and reload the page to see the change. The game requests this file with browser caching disabled, which makes localhost tuning easier.
+
+The baker's two front paws are controlled the same way in `baker_paw_positions.json`. Its `left` and `right` entries use `x` and `y` pixels relative to the baker body.
+
+The accessory artwork is no longer drawn in CSS. Editable transparent PNGs live in `assets/accessories/`:
+
+- `chef.png`
+- `bow.png`
+- `flower.png`
+- `glasses.png`
+- `crown.png`
+
+They are 128×128 transparent canvases. Keep the same filenames when replacing them. Keeping the 128×128 canvas is recommended so the existing in-game sizing stays predictable. The Shop accessory icons use these same PNGs, so artwork edits show there too.
+
+
+## Accessory placement and size
+
+Edit `accessory_positions.json` to tune each baker accessory without touching CSS or JavaScript. Each accessory supports `x`, `y`, and `scale`. Increasing `x` moves it right, increasing `y` moves it down, and increasing `scale` makes the PNG larger (`1.0` normal, `1.5` 50% larger, `2.0` double size). Refresh the locally served page after saving.
+
+
+## v1.22 additions
+- Relax mode now mirrors the currently equipped bakery decor theme.
+- Added William de Crow mode, a no-pressure friend hangout with interactive crow reactions, crumb sharing, and shiny-object moments.
+- Bottom navigation now includes the Crow mode.
+## William de Crow dialogue
+
+William's tap dialogue is stored in `william_de_crow_dialogue.json`. The current bank contains 475 simple crow/bakery jokes and 25 statistics/DOE comments. The game explicitly uses `stats_probability: 0.05`, so the statistics comments remain about 5% even if you add or remove lines later.
+
+
+
+### William de Crow dance
+The Crow mode includes a Dance button that runs a roughly 15-second cat-and-crow dance animation, then returns both characters to idle automatically.
+
+
+## v1.26 Book activity records
+The Recipe Book now also records side-activity totals: slot spins, actual slot wins, fish caught, items given to William, items received from William, William dance parties, and the number of times William has delivered one of his statistics/DOE comments. Existing saves keep their prior slot-spin and fish-catch totals; the newly introduced William/slot-win counters begin at zero and accumulate from this version forward.

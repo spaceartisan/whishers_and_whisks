@@ -1,0 +1,5 @@
+{
+  "_note": "Baker front paw offsets in pixels relative to the baker body. Increase x to move right. Increase y to move down. Save this file and reload the page to test changes.",
+  "left": { "x": -6, "y": 45 },
+  "right": { "x": 54, "y": 45 }
+}
