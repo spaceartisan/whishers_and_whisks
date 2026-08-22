@@ -107,3 +107,13 @@ Relax mode now allows the lounging cat to be given a custom persistent name. The
 
 ## v1.28 Achievements
 The Book now includes a persistent achievement system with more than 50 milestones spanning baking, friendship, shopping, slots, fishing, Relax mode, William de Crow, and cross-mode play. Existing saves are evaluated retroactively where the necessary counters already exist.
+
+
+## v1.29 — Player cat fur customization
+
+Relax mode now includes persistent fur-color customization with several presets plus the browser color picker. The selected fur color is the canonical player-cat color and propagates to the bakery baker, baking paws/body, Vacation Lake fishing cat, Relax cat, and William de Crow companion cat. Customer cats retain their own individual colors. Existing saves default to the original ginger baker color.
+
+
+## v1.30 — New fur-pattern presets
+
+Added three new player-cat appearance presets in Relax mode: **Silver Tabby**, **Tuxedo**, and **Cow Pattern**. Choosing one updates the player cat everywhere it appears (Bakery, Relax, Vacation Lake, and William de Crow mode). Solid color presets and the custom color picker still work as before.

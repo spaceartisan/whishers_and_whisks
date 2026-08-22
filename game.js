@@ -236,7 +236,7 @@
     bait:5, fishingRodLevel:1, fishingReelLevel:1, fishCaught:0,
     fishingLast:null, fishingEarned:0, fishRecords:[],
     williamItemsGiven:0, williamItemsReceived:0, williamDanceParties:0, williamStatisticsMentions:0,
-    relaxCatName:'', relaxPetSessions:0, relaxPetTimeMs:0,
+    relaxCatName:'', playerCatColor:'#c58f62', playerCatPreset:'solid', relaxPetSessions:0, relaxPetTimeMs:0,
     unlockedAchievements:{},
     ingredientStock:{pantry:5,fresh:0,choice:0,clover:0,moonlit:0}, lastIngredientGrade:'pantry',
     qualityCounts:{homey:0,cozy:0,fancy:0,purrfect:0,'cats-meow':0}, clerkPats:0
@@ -343,10 +343,37 @@
     toastTimer=setTimeout(()=>el.classList.remove('show'),1500);
   }
 
+  function playerCatColor(){
+    const value=String(state.playerCatColor||'').trim();
+    return /^#[0-9a-f]{6}$/i.test(value)?value:'#c58f62';
+  }
+  function playerCatPreset(){
+    const value=String(state.playerCatPreset||'solid').trim();
+    return ['solid','silver-tabby','tuxedo','cow'].includes(value)?value:'solid';
+  }
+  function playerCatLook(){
+    const preset=playerCatPreset();
+    if(preset==='silver-tabby') return {color:'#bcc3ca', preset};
+    if(preset==='tuxedo') return {color:'#2f3137', preset};
+    if(preset==='cow') return {color:'#f7f4ef', preset};
+    return {color:playerCatColor(), preset:'solid'};
+  }
+  function applyLookToElement(el, look){
+    if(!el) return;
+    el.style.setProperty('--cat', look.color);
+    if(look.preset && look.preset!=='solid') el.dataset.look=look.preset;
+    else delete el.dataset.look;
+  }
+  function applyPlayerCatColor(){
+    const look=playerCatLook();
+    const app=$('#app'); if(app)app.style.setProperty('--baker-cat',look.color);
+    document.documentElement.style.setProperty('--baker-cat',look.color);
+  }
   function updateAll(){
     ['#coin-count','#coin-count-bake','#coin-count-shop','#coin-count-slots','#coin-count-vacation'].forEach(id=>{ const e=$(id); if(e)e.textContent=formatCoins(state.coins); });
     $('#sound-btn').textContent=state.sound?'♪':'♩';
     currentCat = cats.find(c=>c.id===state.currentCat) || currentCat || cats[0];
+    applyPlayerCatColor();
     renderBakery(); renderShop(); renderSlots(); renderVacation(); renderRelax(); renderCrow(); renderBook();
   }
 
@@ -356,7 +383,9 @@
     const fav=recipes.find(r=>r.id===currentCat.favorite);
     $('#customer-wish').textContent=(fav && state.unlockedRecipes.includes(fav.id)) ? `would love ${(/^[aeiou]/i.test(fav.name)?'an ':'a ')+fav.name.toLowerCase()}` : 'is happy with anything warm';
     setCatVisual($('#customer-cat'),currentCat);
-    setCatVisual($('#baker-cat'),{color:'#c58f62'});
+    const playerLook=playerCatLook();
+    applyLookToElement($('#baker-cat'),playerLook);
+    const bakerWrap=$('.baker-wrap'); if(bakerWrap){ if(playerLook.preset!=='solid') bakerWrap.dataset.look=playerLook.preset; else delete bakerWrap.dataset.look; bakerWrap.style.setProperty('--cat',playerLook.color); }
     const hearts=clamp(state.friendships[currentCat.id]||0,0,5);
     $('#friendship-row').innerHTML=Array.from({length:5},(_,i)=>`<span class="${i<hearts?'filled':''}">♥</span>`).join('');
     const acc=accessories.find(a=>a.id===state.equippedAccessory)||accessories[0];
@@ -807,6 +836,7 @@
   function renderVacation(){
     const bait=$('#bait-count');
     if(!bait)return;
+    applyLookToElement($('.fishing-cat'),playerCatLook());
     const rod=fishingRodInfo(), reel=fishingReelInfo();
     bait.textContent=state.bait||0;
     const rodLevelEl=$('#rod-level'), reelLevelEl=$('#reel-level');
@@ -889,7 +919,7 @@
   function renderRelax(){
     const catEl=$('#relax-cat');
     if(!catEl)return;
-    setCatVisual(catEl,currentCat);
+    applyLookToElement(catEl,playerCatLook());
     const room=$('.relax-room');
     if(room){
       room.className='relax-room';
@@ -899,6 +929,13 @@
     const name=$('#relax-cat-name'); if(name)name.textContent=`${relaxName} is relaxing.`;
     const nameInput=$('#relax-name-input');
     if(nameInput && document.activeElement!==nameInput)nameInput.value=state.relaxCatName||'';
+    const color=playerCatColor();
+    const preset=playerCatPreset();
+    const colorInput=$('#fur-color-input'); if(colorInput && document.activeElement!==colorInput)colorInput.value=color;
+    $$('.fur-swatch[data-fur]').forEach(btn=>btn.classList.toggle('active',preset==='solid' && String(btn.dataset.fur).toLowerCase()===color.toLowerCase()));
+    $$('.fur-swatch[data-preset]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.preset)===preset));
+    const presetColors=$$('.fur-swatch[data-fur]').map(btn=>String(btn.dataset.fur).toLowerCase());
+    const custom=$('.fur-custom'); if(custom)custom.classList.toggle('active',preset==='solid' && !presetColors.includes(color.toLowerCase()));
     const sound=$('#relax-sound-btn'); if(sound)sound.textContent=state.sound?'♪':'♩';
   }
 
@@ -991,6 +1028,36 @@
   }
   $('#relax-name-save')?.addEventListener('click',saveRelaxCatName);
   $('#relax-name-input')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveRelaxCatName();e.currentTarget.blur();}});
+  function setPlayerCatColor(color){
+    if(!/^#[0-9a-f]{6}$/i.test(String(color||'')))return;
+    state.playerCatColor=String(color).toLowerCase();
+    state.playerCatPreset='solid';
+    save();
+    toast('Fur color updated');
+  }
+  function setPlayerCatPreset(preset){
+    if(!['silver-tabby','tuxedo','cow'].includes(String(preset)))return;
+    state.playerCatPreset=String(preset);
+    save();
+    toast('Fur pattern updated');
+  }
+  $$('.fur-swatch[data-fur]').forEach(btn=>btn.addEventListener('click',()=>setPlayerCatColor(btn.dataset.fur)));
+  $$('.fur-swatch[data-preset]').forEach(btn=>btn.addEventListener('click',()=>setPlayerCatPreset(btn.dataset.preset)));
+  $('#fur-color-input')?.addEventListener('input',e=>{
+    const color=e.currentTarget.value;
+    if(/^#[0-9a-f]{6}$/i.test(color)){
+      state.playerCatColor=color.toLowerCase();
+      state.playerCatPreset='solid';
+      applyPlayerCatColor();
+      const look=playerCatLook();
+      applyLookToElement($('#relax-cat'),look);
+      applyLookToElement($('#baker-cat'),look);
+      applyLookToElement($('.fishing-cat'),look);
+      applyLookToElement($('#crow-cat'),look);
+      const bakerWrap=$('.baker-wrap'); if(bakerWrap){ delete bakerWrap.dataset.look; bakerWrap.style.setProperty('--cat',look.color); }
+    }
+  });
+  $('#fur-color-input')?.addEventListener('change',e=>setPlayerCatColor(e.currentTarget.value));
 
   const defaultCrowDialogue={
     jokes:[
@@ -1038,7 +1105,7 @@
   function renderCrow(){
     const cat=$('#crow-cat');
     if(!cat)return;
-    setCatVisual(cat,currentCat);
+    applyLookToElement(cat,playerCatLook());
     const sound=$('#crow-sound-btn'); if(sound)sound.textContent=state.sound?'♪':'♩';
   }
 
