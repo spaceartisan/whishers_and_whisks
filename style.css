@@ -120,7 +120,7 @@ button:focus-visible{outline:3px solid rgba(217,137,143,.45);outline-offset:2px}
 
 
 /* Relax mode */
-.relax-wrap{min-height:calc(100svh - 78px);padding:0 14px 104px;background:linear-gradient(#f6eadf,#eadfd8);overflow:hidden}
+.relax-wrap{min-height:calc(100svh - 78px);padding:0 14px 104px;background:linear-gradient(#f6eadf,#eadfd8);overflow-x:hidden;overflow-y:visible}
 .relax-room{height:470px;position:relative;margin:0 -14px;background:linear-gradient(#e9d8c9 0 69%,#c8a98d 69%);overflow:hidden}
 .relax-window{position:absolute;left:28px;top:27px;width:122px;height:145px;border:9px solid #fff8ee;border-radius:58px 58px 9px 9px;overflow:hidden;box-shadow:0 5px 14px rgba(83,60,51,.13)}
 .relax-sky{position:absolute;inset:0;background:linear-gradient(#8f99b6,#e6b6ab 68%,#d6ab86)}
@@ -380,3 +380,23 @@ button,.nav-btn,.recipe-card,.ingredient-btn,.topping-btn,.shop-buy,.slot-bet,.s
 .relax-cat[data-look="cow"] .relax-body:before,
 .crow-cat[data-look="cow"] .crow-cat-head:before,
 .crow-cat[data-look="cow"] .crow-cat-body:before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at 24% 28%, #2e2d2c 0 13%, transparent 14%),radial-gradient(circle at 72% 60%, #2e2d2c 0 16%, transparent 17%),radial-gradient(circle at 78% 22%, #2e2d2c 0 8%, transparent 9%);pointer-events:none}
+
+
+/* Relax screen scroll area: keeps rename and coat controls reachable on short windows and phones. */
+#relax-screen.active{
+  height:var(--app-height);
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+}
+#relax-screen .relax-wrap{
+  min-height:calc(var(--app-height) - 78px);
+  overflow-x:hidden;
+  overflow-y:visible;
+}
+@media (pointer:fine){
+  #relax-screen.active{overflow-y:scroll}
+}

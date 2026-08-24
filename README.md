@@ -122,3 +122,8 @@ Added three new player-cat appearance presets in Relax mode: **Silver Tabby**, *
 ## v1.31 — Ear visibility fix
 
 Fixed player-cat ear clipping in the new fur-pattern presets. Bakery, Relax, and William de Crow scenes no longer clip or hide the ears. Vacation was already correct and remains unchanged.
+
+
+## v1.32 — Relax screen scrolling
+
+Relax mode now has its own vertical scroll area so the rename and fur/coat controls remain reachable on short desktop windows and smaller mobile viewports. Desktop browsers show a scrollbar; mobile keeps touch scrolling.
