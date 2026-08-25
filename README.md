@@ -127,3 +127,8 @@ Fixed player-cat ear clipping in the new fur-pattern presets. Bakery, Relax, and
 ## v1.32 — Relax screen scrolling
 
 Relax mode now has its own vertical scroll area so the rename and fur/coat controls remain reachable on short desktop windows and smaller mobile viewports. Desktop browsers show a scrollbar; mobile keeps touch scrolling.
+
+
+## v1.33 — iPhone/WebKit audio unlock fix
+
+Fixed a Web Audio compatibility issue that could leave the main synthesized sound effects silent on iPhone Safari/PWA. The generic sound-effect path now explicitly resumes a suspended AudioContext, and normal touch/pointer/keyboard gestures re-unlock audio after iOS suspends it (for example after app switching). Crow and Relax audio use the same context helper. Main effect volume was also raised slightly for phone speakers.

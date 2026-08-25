@@ -325,19 +325,57 @@
     for(const q of bakeQualities) if(score>=q.min) quality=q;
     return quality;
   }
+  function getAudioContext(){
+    try{
+      const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContextClass)return null;
+      audioCtx=audioCtx||new AudioContextClass();
+      return audioCtx;
+    }catch{return null;}
+  }
+  function unlockAudio(){
+    const ctx=getAudioContext();
+    if(!ctx)return;
+    if(ctx.state==='suspended'){
+      try{
+        const resumed=ctx.resume();
+        if(resumed&&typeof resumed.then==='function'){
+          resumed.then(()=>{
+            try{
+              const buffer=ctx.createBuffer(1,1,22050);
+              const source=ctx.createBufferSource();
+              source.buffer=buffer; source.connect(ctx.destination); source.start(0);
+            }catch{}
+          }).catch(()=>{});
+        }
+      }catch{}
+    }
+  }
   function ding(type='soft'){
     if(!state.sound) return;
-    try{
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-      osc.type='sine'; osc.frequency.setValueAtTime(type==='coin'?660:type==='heart'?520:420, now);
-      if(type==='coin') osc.frequency.exponentialRampToValueAtTime(880, now+.12);
-      if(type==='heart') osc.frequency.exponentialRampToValueAtTime(650, now+.16);
-      gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.055,now+.015); gain.gain.exponentialRampToValueAtTime(.0001,now+.22);
-      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+.24);
-    }catch{}
+    const ctx=getAudioContext();
+    if(!ctx)return;
+    const play=()=>{
+      try{
+        const now=ctx.currentTime;
+        const osc=ctx.createOscillator(); const gain=ctx.createGain();
+        osc.type='sine'; osc.frequency.setValueAtTime(type==='coin'?660:type==='heart'?520:420,now);
+        if(type==='coin')osc.frequency.exponentialRampToValueAtTime(880,now+.12);
+        if(type==='heart')osc.frequency.exponentialRampToValueAtTime(650,now+.16);
+        gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.075,now+.015); gain.gain.exponentialRampToValueAtTime(.0001,now+.22);
+        osc.connect(gain); gain.connect(ctx.destination); osc.start(now); osc.stop(now+.24);
+      }catch{}
+    };
+    if(ctx.state==='suspended'){
+      try{ctx.resume().then(play).catch(()=>{});}catch{}
+    }else play();
   }
+  // iOS Safari/WebKit requires Web Audio to be resumed from a real user gesture.
+  // Keep these listeners active because iOS may suspend the context again after app switching.
+  document.addEventListener('pointerdown',unlockAudio,{capture:true,passive:true});
+  document.addEventListener('touchend',unlockAudio,{capture:true,passive:true});
+  document.addEventListener('keydown',unlockAudio,{capture:true});
+
   function toast(msg){
     const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer);
     toastTimer=setTimeout(()=>el.classList.remove('show'),1500);
@@ -942,8 +980,9 @@
   function startRelaxPurr(){
     if(!state.sound || relaxPurr)return;
     try{
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      if(audioCtx.state==='suspended')audioCtx.resume();
+      audioCtx=getAudioContext();
+      if(!audioCtx)return;
+      if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
       const now=audioCtx.currentTime;
       const master=audioCtx.createGain();
       const low=audioCtx.createBiquadFilter(); low.type='lowpass'; low.frequency.value=240;
@@ -1112,8 +1151,9 @@
   function crowChirp(){
     if(!state.sound)return;
     try{
-      audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
-      if(audioCtx.state==='suspended')audioCtx.resume();
+      audioCtx=getAudioContext();
+      if(!audioCtx)return;
+      if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
       const now=audioCtx.currentTime, osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
       osc.type='triangle'; osc.frequency.setValueAtTime(510,now); osc.frequency.exponentialRampToValueAtTime(330,now+.1);
       gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(.035,now+.015); gain.gain.exponentialRampToValueAtTime(.0001,now+.13);
