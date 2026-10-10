@@ -400,3 +400,80 @@ button,.nav-btn,.recipe-card,.ingredient-btn,.topping-btn,.shop-buy,.slot-bet,.s
 @media (pointer:fine){
   #relax-screen.active{overflow-y:scroll}
 }
+
+
+/* v1.34 — cohesive polish and touch usability */
+:root{--focus:#ad747e;--gold-soft:#ffedbe}
+html,body{overscroll-behavior-y:auto}
+#app{isolation:isolate}
+button,select,input{font-family:inherit}
+button{touch-action:manipulation}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+button:disabled{cursor:not-allowed}
+.topbar,.simple-header{box-shadow:0 4px 22px rgba(80,49,38,.04)}
+.nav-btn{min-width:0;min-height:52px;position:relative;transition:background-color .16s,color .16s}
+.nav-btn.active:after{content:"";position:absolute;bottom:4px;width:17px;height:3px;border-radius:99px;background:#bc8188}
+.nav-btn:active{background:#f2e2d7}
+.primary-btn,.shop-buy,.fishing-action,.slot-spin,.tackle-buy,.bait-buy{transition:filter .18s,box-shadow .18s,transform .18s}
+.primary-btn:not(:disabled):active,.shop-buy:not(:disabled):active{filter:brightness(.97)}
+.toast{max-width:calc(100vw - 32px);white-space:normal;text-align:center;line-height:1.35;bottom:calc(94px + env(safe-area-inset-bottom));box-shadow:0 12px 26px rgba(52,36,29,.24)}
+.bakery-scene{min-height:540px;max-height:740px}
+.customer-card{border:1px solid rgba(255,255,255,.72)}
+.home-dashboard{margin:14px 14px calc(100px + env(safe-area-inset-bottom));padding:15px;border-radius:23px;background:var(--paper);box-shadow:0 8px 22px var(--shadow)}
+.home-greeting{display:flex;align-items:center;gap:10px}
+.home-greeting-icon{flex:0 0 42px;height:42px;border-radius:15px;background:#fff0c8;color:#bd9860;display:grid;place-items:center;font-size:21px}
+.home-greeting strong,.home-greeting small{display:block}
+.home-greeting strong{font-size:15px;letter-spacing:-.2px}.home-greeting small{font-size:10px;color:var(--muted);margin-top:2px}
+.home-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:14px 0 11px}
+.home-metrics div{border-radius:14px;background:#f7ede4;padding:10px 5px;text-align:center}
+.home-metrics strong{font-size:19px;display:block;line-height:1.1;font-variant-numeric:tabular-nums}
+.home-metrics small{font-size:10px;color:var(--muted);display:block;margin-top:3px}
+.home-next{padding:12px;border-radius:16px;background:linear-gradient(120deg,#f7e6df,#f9eddb)}
+.home-next>span{font-size:9px;font-weight:900;letter-spacing:1px;color:#9d7e74}
+.home-next strong,.home-next small{display:block}.home-next strong{font-size:13px;margin-top:3px}.home-next small{font-size:10px;color:var(--muted);margin-top:3px}
+.home-next-track,.achievement-summary-track{height:6px;border-radius:999px;background:rgba(112,84,72,.12);overflow:hidden;margin-top:9px}
+.home-next-track>div,.achievement-summary-track>div{height:100%;width:0;background:#cb8b94;border-radius:inherit;transition:width .35s ease}
+.achievements-records{margin-top:5px}
+.achievement-meta{background:#f7eee5;border-radius:15px;padding:10px 11px;margin-bottom:10px}
+.achievement-meta .achievement-summary-track{margin:0 0 7px;height:8px}
+.achievement-meta>span{font-size:10px;color:var(--muted);line-height:1.4;display:block}
+.achievement-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 10px}
+.achievement-filter{border:1px solid #e7d9ce;border-radius:13px;background:#f9f1e9;padding:10px 5px;font-size:11px;font-weight:800;cursor:pointer}
+.achievement-filter.active{border-color:#c88e91;background:#f3d8d7;color:#65433d}
+.achievement-category-select-label{display:flex;align-items:center;gap:10px;justify-content:space-between;font-size:11px;font-weight:800;color:var(--muted);margin:0 0 11px}
+.achievement-category-select-label select{max-width:70%;flex:1;border:1px solid #e4d7ce;background:#fff8ee;border-radius:12px;color:var(--ink);padding:9px 10px;font-size:12px}
+.achievements-empty{text-align:center;font-size:12px;padding:24px 12px;color:var(--muted)}
+.save-tools{background:var(--paper);border-radius:22px;box-shadow:0 6px 18px var(--shadow);padding:14px;margin:0 16px 16px}
+.save-tools-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.save-tools-heading strong,.save-tools-heading small{display:block}
+.save-tools-heading strong{font-size:14px}.save-tools-heading small{font-size:11px;color:var(--muted);line-height:1.35;margin-top:4px}
+.save-tools-heading>span{font-size:28px;color:#cf929c}
+.save-tools-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0}
+.save-tools-actions button{border:0;border-radius:14px;background:#e9d3c6;padding:13px 10px;font-weight:900;font-size:12px;cursor:pointer}
+.save-tools-actions button:first-child{background:#f4e5bb}
+.save-tools-note{font-size:10px;color:var(--muted);line-height:1.4;margin:0}
+@media(max-width:360px){.bottom-nav{padding-left:3px;padding-right:3px}.nav-btn{font-size:9px;gap:0}.nav-btn span{font-size:20px}.topbar,.simple-header{padding-left:9px;padding-right:9px}.title-wrap h1{font-size:17px}.coins{min-width:65px;padding:0 7px}.home-dashboard{margin-left:10px;margin-right:10px}}
+@media(min-width:541px){body{background:radial-gradient(ellipse at 50% 14%,#f6e6d3,#e2c9b5 65%,#d3b6a0)}#app{border-left:1px solid rgba(117,76,58,.08);border-right:1px solid rgba(117,76,58,.08)}}
+@media(prefers-reduced-motion:reduce){.nav-btn,.home-next-track>div,.achievement-summary-track>div{transition:none}}
+
+.mode-milestones{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px auto 0;color:#8b7165;font-size:11px;font-weight:700}
+.mode-milestones span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.mode-milestones strong{font-variant-numeric:tabular-nums;color:var(--ink)}
+.relax-milestones{padding-top:10px;border-top:1px solid rgba(112,84,72,.08)}
+.save-tools-actions .restore-backup-btn{grid-column:1 / -1;background:#eee5e2;color:#785f57}
+.save-tools-actions .restore-backup-btn:disabled{opacity:.45;cursor:default}
+@media(max-width:340px){.mode-milestones{gap:8px;font-size:10px}}
+
+/* Shared reliable vertical scrolling for the remaining activity scenes. */
+#slots-screen.active,#crow-screen.active{
+  height:var(--app-height);
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  scrollbar-gutter:stable;
+}
+#slots-screen .slots-wrap{overflow-x:hidden;overflow-y:visible}
+#crow-screen .crow-wrap{overflow-x:hidden}
+@media (pointer:fine){#slots-screen.active,#crow-screen.active{overflow-y:scroll}}

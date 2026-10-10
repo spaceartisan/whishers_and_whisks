@@ -227,7 +227,10 @@
   ];
 
   const toppings = ['🍓','✨','🌸','🍫','🫐','🤍'];
+  // Keep this key stable: every release since v1 stored progress here.
   const saveKey = 'whiskersAndWhisksSaveV1';
+  const safetyBackupKey = 'whiskersAndWhisksSaveBackupV134';
+  const saveSchemaVersion = 2;
   const fresh = () => ({
     coins:35, unlockedRecipes:['cookie'], ownedAccessories:['none'], equippedAccessory:'none',
     ownedDecor:['classic'], equippedDecor:'classic', equipmentLevel:1, friendships:{}, bakes:{}, totalBakes:0,
@@ -272,15 +275,70 @@
   let crowDanceBeatTimer = null;
   let crowDanceEmojiTimer = null;
 
+  function validSaveData(candidate){
+    return candidate && typeof candidate==='object' && !Array.isArray(candidate) &&
+      ['coins','unlockedRecipes','totalBakes','ownedDecor','friendships','memories','slotSpins','fishCaught','relaxCatName'].some(key=>Object.prototype.hasOwnProperty.call(candidate,key));
+  }
+  function nonnegativeNumber(value, fallback=0){
+    const numeric=Number(value);
+    return Number.isFinite(numeric) ? Math.max(0,numeric) : fallback;
+  }
+  function normalizeSave(candidate){
+    const defaults=fresh();
+    if(!validSaveData(candidate))return defaults;
+    // Preserve unknown keys for forward compatibility while validating those required by this game.
+    const next=Object.assign({},defaults,candidate);
+    for(const key of ['coins','totalBakes','equipmentLevel','slotBet','slotSpins','slotWon','slotWins','slotLastPayout','slotLastBet','bait','fishingRodLevel','fishingReelLevel','fishCaught','fishingEarned','williamItemsGiven','williamItemsReceived','williamDanceParties','williamStatisticsMentions','relaxPetSessions','relaxPetTimeMs','clerkPats']){
+      next[key]=nonnegativeNumber(candidate[key],defaults[key]);
+    }
+    next.coins=Math.floor(next.coins);
+    next.equipmentLevel=Math.max(1,Math.min(equipmentLevels.length,Math.floor(next.equipmentLevel)));
+    next.fishingRodLevel=Math.max(1,Math.min(fishingRods.length,Math.floor(next.fishingRodLevel)));
+    next.fishingReelLevel=Math.max(1,Math.min(fishingReels.length,Math.floor(next.fishingReelLevel)));
+    next.sound=typeof candidate.sound==='boolean'?candidate.sound:defaults.sound;
+    next.relaxCatName=typeof candidate.relaxCatName==='string'?candidate.relaxCatName.slice(0,24):'';
+    next.playerCatColor=typeof candidate.playerCatColor==='string'?candidate.playerCatColor:defaults.playerCatColor;
+    next.playerCatPreset=['solid','silver-tabby','tuxedo','cow'].includes(candidate.playerCatPreset)?candidate.playerCatPreset:'solid';
+    next.unlockedRecipes=Array.isArray(candidate.unlockedRecipes)?[...new Set(['cookie',...candidate.unlockedRecipes.filter(x=>typeof x==='string'&&x.length<=64)])]:defaults.unlockedRecipes.slice();
+    next.ownedAccessories=Array.isArray(candidate.ownedAccessories)?[...new Set(['none',...candidate.ownedAccessories.filter(x=>typeof x==='string'&&x.length<=64)])]:defaults.ownedAccessories.slice();
+    next.ownedDecor=Array.isArray(candidate.ownedDecor)?[...new Set(['classic',...candidate.ownedDecor.filter(x=>typeof x==='string'&&x.length<=64)])]:defaults.ownedDecor.slice();
+    if(!next.ownedAccessories.includes(next.equippedAccessory))next.equippedAccessory='none';
+    if(!next.ownedDecor.includes(next.equippedDecor))next.equippedDecor='classic';
+    next.currentCat=cats.some(c=>c.id===candidate.currentCat)?candidate.currentCat:defaults.currentCat;
+    const dict=(source,base)=>source&&typeof source==='object'&&!Array.isArray(source)?Object.assign({},base,source):Object.assign({},base);
+    next.ingredientStock=dict(candidate.ingredientStock,defaults.ingredientStock);
+    next.qualityCounts=dict(candidate.qualityCounts,defaults.qualityCounts);
+    next.friendships=dict(candidate.friendships,defaults.friendships);
+    next.bakes=dict(candidate.bakes,defaults.bakes);
+    next.unlockedAchievements=dict(candidate.unlockedAchievements,defaults.unlockedAchievements);
+    for(const key of Object.keys(defaults.ingredientStock))next.ingredientStock[key]=Math.floor(nonnegativeNumber(next.ingredientStock[key],defaults.ingredientStock[key]));
+    for(const key of Object.keys(defaults.qualityCounts))next.qualityCounts[key]=Math.floor(nonnegativeNumber(next.qualityCounts[key],0));
+    for(const key of Object.keys(next.friendships))next.friendships[key]=Math.max(0,Math.min(5,nonnegativeNumber(next.friendships[key],0)));
+    for(const key of Object.keys(next.bakes))next.bakes[key]=Math.floor(nonnegativeNumber(next.bakes[key],0));
+    next.memories=Array.isArray(candidate.memories)?candidate.memories.filter(x=>x&&typeof x==='object'&&!Array.isArray(x)).slice(0,200).map(x=>Object.assign({},x,{toppings:Array.isArray(x.toppings)?x.toppings.filter(v=>typeof v==='string').slice(0,12):[]})):[];
+    next.fishRecords=Array.isArray(candidate.fishRecords)?candidate.fishRecords.filter(x=>x&&typeof x==='object'&&Number.isFinite(Number(x.sizeLb))).slice(0,3):[];
+    next.fishingLast=candidate.fishingLast&&typeof candidate.fishingLast==='object'&&!Array.isArray(candidate.fishingLast)?candidate.fishingLast:null;
+    next.slotLast=Array.isArray(candidate.slotLast)&&candidate.slotLast.length===3?candidate.slotLast:defaults.slotLast.slice();
+    next.lastIngredientGrade=ingredientGrades.some(g=>g.id===candidate.lastIngredientGrade)?candidate.lastIngredientGrade:defaults.lastIngredientGrade;
+    next.saveSchemaVersion=saveSchemaVersion;
+    return next;
+  }
+  function writeSafetyBackup(raw){
+    if(typeof raw!=='string'||raw.length===0)return;
+    try{localStorage.setItem(safetyBackupKey,raw);}catch{}
+  }
   function load(){
-    try {
-      const parsed = JSON.parse(localStorage.getItem(saveKey));
-      const next = Object.assign(fresh(), parsed || {});
-      next.ingredientStock = Object.assign(fresh().ingredientStock, parsed?.ingredientStock || {});
-      next.qualityCounts = Object.assign(fresh().qualityCounts, parsed?.qualityCounts || {});
-      next.unlockedAchievements = Object.assign({}, parsed?.unlockedAchievements || {});
-      return next;
-    } catch { return fresh(); }
+    const raw=localStorage.getItem(saveKey);
+    if(!raw)return fresh();
+    try{
+      const candidate=JSON.parse(raw);
+      if(!validSaveData(candidate)){writeSafetyBackup(raw);return fresh();}
+      if(candidate.saveSchemaVersion!==saveSchemaVersion)writeSafetyBackup(raw);
+      return normalizeSave(candidate);
+    }catch{
+      writeSafetyBackup(raw);
+      return fresh();
+    }
   }
   function achievementProgress(achievement){
     const value=Math.max(0,Number(achievement.value(state))||0);
@@ -307,7 +365,7 @@
   }
   function save(){
     const newly=evaluateAchievements(false);
-    localStorage.setItem(saveKey, JSON.stringify(state));
+    try{localStorage.setItem(saveKey, JSON.stringify(state));}catch{toast('Browser storage is full — export your save');}
     updateAll();
     if(newly.length)setTimeout(()=>{ding('heart');toast(newly.length===1?`Achievement: ${newly[0].title}`:`${newly.length} achievements unlocked!`);},0);
   }
@@ -410,9 +468,34 @@
   function updateAll(){
     ['#coin-count','#coin-count-bake','#coin-count-shop','#coin-count-slots','#coin-count-vacation'].forEach(id=>{ const e=$(id); if(e)e.textContent=formatCoins(state.coins); });
     $('#sound-btn').textContent=state.sound?'♪':'♩';
-    currentCat = cats.find(c=>c.id===state.currentCat) || currentCat || cats[0];
+    $('#sound-btn').setAttribute('aria-pressed',String(state.sound));
+    currentCat=cats.find(c=>c.id===state.currentCat) || currentCat || cats[0];
     applyPlayerCatColor();
-    renderBakery(); renderShop(); renderSlots(); renderVacation(); renderRelax(); renderCrow(); renderBook();
+    const active=$('.screen.active')?.id;
+    $$('.nav-btn').forEach(btn=>{const selected=btn.dataset.screen===active;btn.classList.toggle('active',selected);if(selected)btn.setAttribute('aria-current','page');else btn.removeAttribute('aria-current');});
+    if(active==='bakery-screen'){renderBakery();renderHomeDashboard();}
+    if(active==='shop-screen')renderShop();
+    if(active==='slots-screen')renderSlots();
+    if(active==='vacation-screen')renderVacation();
+    if(active==='relax-screen')renderRelax();
+    if(active==='crow-screen')renderCrow();
+    if(active==='book-screen')renderBook();
+  }
+  function closestAchievement(){
+    return achievements.filter(a=>!state.unlockedAchievements?.[a.id]).map(a=>({achievement:a,progress:achievementProgress(a)}))
+      .sort((a,b)=>b.progress.ratio-a.progress.ratio||a.progress.goal-b.progress.goal)[0]||null;
+  }
+  function renderHomeDashboard(){
+    const name=(state.relaxCatName||'').trim() || 'Your baker';
+    $('#home-cat-name').textContent=`${name}'s cozy bakery`;
+    $('#home-bakery-subtitle').textContent=`${equipmentInfo().name} · ${state.unlockedRecipes.length} recipes ready`;
+    $('#home-bakes').textContent=formatCoins(state.totalBakes);
+    $('#home-friends').textContent=Object.values(state.friendships).filter(x=>x>=5).length;
+    $('#home-badges').textContent=achievements.filter(a=>state.unlockedAchievements?.[a.id]).length;
+    const next=closestAchievement();
+    $('#home-next-title').textContent=next?next.achievement.title:'Every badge unlocked!';
+    $('#home-next-description').textContent=next?next.achievement.desc:'You have done it all. Enjoy your bakery!';
+    $('#home-next-progress').style.width=`${next?Math.round(next.progress.ratio*100):100}%`;
   }
 
   function setCatVisual(el, cat){ if(el) el.style.setProperty('--cat',cat.color); }
@@ -469,6 +552,7 @@
     if(id!=='crow-screen') stopWilliamDance(false);
     $$('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
     window.scrollTo(0,0);
+    const target=$(`#${id}`);if(target)target.scrollTop=0;
     updateAll();
   }
   $$('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>showScreen(btn.dataset.screen)));
@@ -773,6 +857,8 @@
     $$('.slot-bet').forEach(btn=>btn.classList.toggle('active',Number(btn.dataset.bet)===Number(state.slotBet)));
     spin.textContent=`Spin for ${state.slotBet}`;
     spin.disabled=slotSpinning || state.coins<state.slotBet;
+    const spinsMini=$('#slots-played-mini');if(spinsMini)spinsMini.textContent=formatCoins(state.slotSpins);
+    const winsMini=$('#slots-won-mini');if(winsMini)winsMini.textContent=formatCoins(state.slotWins);
     if(!slotSpinning){
       const last=Array.isArray(state.slotLast)&&state.slotLast.length===3?state.slotLast:['🐾','🍪','🍓'];
       last.forEach((symbol,i)=>{const reel=$(`#slot-reel-${i+1}`);if(reel)reel.textContent=symbol;});
@@ -789,8 +875,7 @@
   $$('.slot-bet').forEach(btn=>btn.addEventListener('click',()=>{
     if(slotSpinning)return;
     state.slotBet=Number(btn.dataset.bet);
-    localStorage.setItem(saveKey,JSON.stringify(state));
-    renderSlots();
+    save();
     ding();
   }));
   $('#slot-spin')?.addEventListener('click',spinSlots);
@@ -800,7 +885,7 @@
     if(state.coins<bet){toast('Bake a little more first');return;}
     slotSpinning=true;
     state.coins-=bet;
-    localStorage.setItem(saveKey,JSON.stringify(state));
+    try{localStorage.setItem(saveKey,JSON.stringify(state));}catch{toast('Storage is full; back up your save');}
     const result=$('#slot-result');
     if(result){result.classList.remove('win');result.textContent='The lucky paws are spinning…';}
     const final=[weightedSlotSymbol(),weightedSlotSymbol(),weightedSlotSymbol()];
@@ -974,6 +1059,8 @@
     $$('.fur-swatch[data-preset]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.preset)===preset));
     const presetColors=$$('.fur-swatch[data-fur]').map(btn=>String(btn.dataset.fur).toLowerCase());
     const custom=$('.fur-custom'); if(custom)custom.classList.toggle('active',preset==='solid' && !presetColors.includes(color.toLowerCase()));
+    const petsMini=$('#relax-pets-mini');if(petsMini)petsMini.textContent=formatCoins(state.relaxPetSessions);
+    const relaxTimeMini=$('#relax-time-mini');if(relaxTimeMini)relaxTimeMini.textContent=formatRelaxTime(state.relaxPetTimeMs);
     const sound=$('#relax-sound-btn'); if(sound)sound.textContent=state.sound?'♪':'♩';
   }
 
@@ -1145,6 +1232,9 @@
     const cat=$('#crow-cat');
     if(!cat)return;
     applyLookToElement(cat,playerCatLook());
+    const givenMini=$('#crow-given-mini');if(givenMini)givenMini.textContent=formatCoins(state.williamItemsGiven);
+    const receivedMini=$('#crow-received-mini');if(receivedMini)receivedMini.textContent=formatCoins(state.williamItemsReceived);
+    const partiesMini=$('#crow-parties-mini');if(partiesMini)partiesMini.textContent=formatCoins(state.williamDanceParties);
     const sound=$('#crow-sound-btn'); if(sound)sound.textContent=state.sound?'♪':'♩';
   }
 
@@ -1242,9 +1332,29 @@
     return `${hours}h ${mins}m`;
   }
 
+  let achievementStatusFilter='all';
+  let achievementCategoryFilter='all';
+  const achievementCategorySelect=$('#achievement-category-select');
+  if(achievementCategorySelect){
+    const categories=[...new Set(achievements.map(a=>a.category))];
+    achievementCategorySelect.innerHTML='<option value="all">All activities</option>'+categories.map(category=>`<option value="${category}">${category}</option>`).join('');
+    achievementCategorySelect.addEventListener('change',e=>{achievementCategoryFilter=e.currentTarget.value;renderBook();});
+  }
+  $$('.achievement-filter').forEach(btn=>btn.addEventListener('click',()=>{
+    achievementStatusFilter=btn.dataset.achFilter;
+    $$('.achievement-filter').forEach(item=>item.classList.toggle('active',item===btn));
+    renderBook();
+  }));
+  function formatAchievementProgress(achievement,progress){
+    const value=achievement.format==='time'?formatRelaxTime(progress.value):formatCoins(Math.min(progress.value,progress.goal));
+    const goal=achievement.format==='time'?formatRelaxTime(progress.goal):formatCoins(progress.goal);
+    return `${value} / ${goal}`;
+  }
+
   function renderBook(){
     $('#total-bakes').textContent=state.totalBakes; $('#known-recipes').textContent=state.unlockedRecipes.length;
     $('#cat-friends').textContent=Object.values(state.friendships).filter(v=>v>=5).length;
+    refreshBackupButton();
     const adventureStats={
       'book-slot-spins':state.slotSpins||0,
       'book-slot-wins':state.slotWins||0,
@@ -1261,17 +1371,22 @@
     const achievementList=$('#achievement-list');
     const unlockedCount=achievements.filter(a=>!!state.unlockedAchievements?.[a.id]).length;
     if(achievementCount)achievementCount.textContent=`${unlockedCount} / ${achievements.length}`;
+    const next=closestAchievement();
+    $('#achievement-summary-fill').style.width=`${achievements.length?Math.round(unlockedCount/achievements.length*100):0}%`;
+    $('#achievement-next-label').textContent=next?`Almost there: ${next.achievement.title} · ${formatAchievementProgress(next.achievement,next.progress)}`:'Every achievement earned!';
     if(achievementList){
-      const categories=[...new Set(achievements.map(a=>a.category))];
-      achievementList.innerHTML=categories.map(category=>{
-        const cards=achievements.filter(a=>a.category===category).map(a=>{
+      const matched=achievements.filter(a=>{
+        const earned=!!state.unlockedAchievements?.[a.id];
+        return (achievementCategoryFilter==='all'||a.category===achievementCategoryFilter) && (achievementStatusFilter==='all'||(achievementStatusFilter==='unlocked'?earned:!earned));
+      });
+      const categories=[...new Set(matched.map(a=>a.category))];
+      achievementList.innerHTML=matched.length?categories.map(category=>{
+        const cards=matched.filter(a=>a.category===category).map(a=>{
           const progress=achievementProgress(a), unlocked=!!state.unlockedAchievements?.[a.id];
-          const valueText=a.format==='time'?formatRelaxTime(progress.value):formatCoins(Math.min(progress.value,progress.goal));
-          const goalText=a.format==='time'?formatRelaxTime(progress.goal):formatCoins(progress.goal);
-          return `<div class="achievement-card ${unlocked?'unlocked':'locked'}"><div class="achievement-icon">${a.icon}</div><div class="achievement-copy"><strong>${a.title}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${Math.round(progress.ratio*100)}%"></span></div><em>${unlocked?'Unlocked':`${valueText} / ${goalText}`}</em></div><div class="achievement-check">${unlocked?'✓':'○'}</div></div>`;
+          return `<div class="achievement-card ${unlocked?'unlocked':'locked'}"><div class="achievement-icon">${a.icon}</div><div class="achievement-copy"><strong>${a.title}</strong><small>${a.desc}</small><div class="achievement-progress"><span style="width:${Math.round(progress.ratio*100)}%"></span></div><em>${unlocked?'✓ Unlocked':formatAchievementProgress(a,progress)}</em></div><div class="achievement-check">${unlocked?'✓':'○'}</div></div>`;
         }).join('');
         return `<div class="achievement-category"><h4>${category}</h4>${cards}</div>`;
-      }).join('');
+      }).join(''):'<div class="achievements-empty">Nothing in this category yet. Try another filter ♡</div>';
     }
     const list=$('#memory-list');
     if(!state.totalBakes){list.innerHTML='<div class="empty-memory">Your recipe book is waiting for its first cozy bake.<br><br>Nothing here can be messed up.</div>';return;}
@@ -1282,11 +1397,74 @@
       return `<div class="memory-card"><div class="memoji">${r.emoji}</div><div><strong>${r.name}</strong><small>${cat?`Last served to ${cat.name}`:'A bakery favorite'}${q?` · ${q.name}`:''}${last?.toppings?.length?` · ${last.toppings.join(' ')}`:''}</small></div><div class="memory-count">×${count}</div></div>`;
     }).join('');
   }
+  function createSaveDownload(){
+    const packageData={game:'Whiskers & Whisks',formatVersion:1,exportedAt:new Date().toISOString(),saveKey,state:JSON.parse(JSON.stringify(state))};
+    const blob=new Blob([JSON.stringify(packageData,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');link.href=url;
+    link.download=`whiskers-and-whisks-save-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    toast('Your bakery save is ready to download');
+  }
+  $('#export-save-btn')?.addEventListener('click',createSaveDownload);
+  $('#import-save-btn')?.addEventListener('click',()=>$('#import-save-file')?.click());
+  $('#import-save-file')?.addEventListener('change',async event=>{
+    const input=event.currentTarget, file=input.files?.[0];
+    if(!file)return;
+    try{
+      if(file.size>2_000_000)throw new Error('Save file is too large');
+      const data=JSON.parse(await file.text());
+      if(data?.game && data.game!=='Whiskers & Whisks')throw new Error('This belongs to another game');
+      const candidate=data?.state??data;
+      if(!validSaveData(candidate))throw new Error('Not a recognized bakery save');
+      if(!confirm(`Restore this save?\n\n${formatCoins(candidate.coins||0)} coins · ${formatCoins(candidate.totalBakes||0)} bakes.\n\nYour current progress will be backed up locally first.`))return;
+      const original=localStorage.getItem(saveKey);
+      writeSafetyBackup(original);
+      state=normalizeSave(candidate);
+      selectedIngredientGrade=ingredientGrade();
+      currentCat=cats.find(c=>c.id===state.currentCat)||cats[0];
+      evaluateAchievements(false);
+      save();
+      toast('Save restored! Welcome back to your bakery');
+    }catch(error){toast(error.message||'Could not read that save file');}
+    finally{input.value='';}
+  });
+  function refreshBackupButton(){
+    const button=$('#restore-backup-btn');
+    if(!button)return;
+    const raw=localStorage.getItem(safetyBackupKey);
+    let valid=false;
+    try{valid=validSaveData(JSON.parse(raw));}catch{}
+    button.disabled=!valid;
+    button.title=valid?'Restore the last automatic local backup':'No usable local backup is currently stored';
+  }
+  $('#restore-backup-btn')?.addEventListener('click',()=>{
+    const backup=localStorage.getItem(safetyBackupKey);
+    try{
+      const candidate=JSON.parse(backup);
+      if(!validSaveData(candidate))throw new Error('No usable backup available');
+      if(!confirm(`Restore your last local safety backup?\n\n${formatCoins(candidate.coins||0)} coins · ${formatCoins(candidate.totalBakes||0)} bakes.\n\nConsider exporting your current save first.`))return;
+      const current=localStorage.getItem(saveKey);
+      state=normalizeSave(candidate);
+      currentCat=cats.find(c=>c.id===state.currentCat)||cats[0];
+      selectedIngredientGrade=ingredientGrade();
+      evaluateAchievements(false);
+      try{localStorage.setItem(saveKey,JSON.stringify(state));}catch{}
+      // Keep the former active save as the next recovery point, allowing one-step undo.
+      writeSafetyBackup(current);
+      updateAll();refreshBackupButton();toast('Your safety backup has been restored');
+    }catch(error){toast(error.message||'Backup could not be restored');}
+  });
   $('#reset-btn').addEventListener('click',()=>{
-    if(!confirm('Start the bakery over from the beginning?'))return;
+    if(!confirm('Start the bakery over? Your current progress will be backed up locally first. Export your save in the Book if you want a file copy.'))return;
+    writeSafetyBackup(localStorage.getItem(saveKey));
     if(fishingTimer){clearTimeout(fishingTimer);fishingTimer=null;}
     fishingState='idle';pendingCatch=null;
-    state=fresh();currentCat=cats[0];localStorage.removeItem(saveKey);save();toast('Fresh bakery, fresh start');
+    state=fresh();currentCat=cats[0];achievementStatusFilter='all';achievementCategoryFilter='all';
+    if(achievementCategorySelect)achievementCategorySelect.value='all';
+    $$('.achievement-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.achFilter==='all'));
+    localStorage.removeItem(saveKey);save();toast('Fresh bakery, fresh start');
   });
 
   document.addEventListener('visibilitychange',()=>{if(document.hidden){stopOven();endRelaxPetting();}});
@@ -1301,7 +1479,7 @@
   };
 
   evaluateAchievements(false);
-  localStorage.setItem(saveKey, JSON.stringify(state));
+  try{localStorage.setItem(saveKey, JSON.stringify(state));}catch{}
   updateAll();
   loadAccessoryPositions();
   loadBakerPawPositions();

@@ -132,3 +132,26 @@ Relax mode now has its own vertical scroll area so the rename and fur/coat contr
 ## v1.33 — iPhone/WebKit audio unlock fix
 
 Fixed a Web Audio compatibility issue that could leave the main synthesized sound effects silent on iPhone Safari/PWA. The generic sound-effect path now explicitly resumes a suspended AudioContext, and normal touch/pointer/keyboard gestures re-unlock audio after iOS suspends it (for example after app switching). Crow and Relax audio use the same context helper. Main effect volume was also raised slightly for phone speakers.
+
+
+## v1.34 — Cozy Overhaul and Save-Safe Update
+
+This release is based on the user-supplied authoritative main ZIP; all previous game activities and manually adjusted accessory/paw JSONs are preserved.
+
+- An upgraded bakery home hub adds lifetime treats, best friends, badges earned, and the nearest remaining achievement.
+- The Book has achievement totals, an overall completion bar, All / Unlocked / In progress filters, and a category selector to make large collections browseable.
+- **Save export / import** in the Book can move progress between devices and browsers. Export JSON first, then import on the other device. Imports preview core counts, request explicit confirmation, and preserve a local pre-import backup.
+- Save data keeps the existing `whiskersAndWhisksSaveV1` localStorage key. Migration fills new fields without erasing older progression, validates malformed numbers/collections, retains unknown keys for forward compatibility, and keeps a safety copy under `whiskersAndWhisksSaveBackupV134` before migration or import.
+- Improved mobile navigation focus and touch states, responsive home and achievements UI, legible toast notifications, and reduced-motion support.
+- Only the active screen is rebuilt after gameplay updates, reducing DOM churn from large achievement collections and eliminating hidden-screen re-renders during interactions.
+
+The exported save format is an object with `game`, `formatVersion`, `exportedAt`, `saveKey`, and `state`. The Import feature also accepts legacy plain state JSON with recognized game progress fields. No backend is required.
+
+
+Additional v1.34 touches: in-mode lifetime counters for Slots, Relax and William, plus a Restore Safety Backup action in the Book. The backup button is enabled only when there is a recognizable older saved state. A restore swaps the current state into the safety slot so a mistaken restore can be undone.
+
+## Regression test
+
+Run `node tests/save-compatibility.test.cjs` to check backwards compatibility with a sparse historical save, a v1.33-style progressed save, corrupted and malformed data, Book rendering, and preservation of the unchanged save key. This test does not replace real-device visual/audio testing. As an extra safeguard, export a save from the Book before upgrading on iPhone.
+
+Static CSS and JavaScript URLs include a v1.34 cache-busting query so returning GitHub Pages/iPhone users are less likely to keep an older cached UI after deployment.

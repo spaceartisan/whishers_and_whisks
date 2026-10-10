@@ -4,16 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#f7d9c4" />
+  <meta name="description" content="Bake tiny treats, befriend cats, collect badges and relax at the coziest little bakery." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Whiskers & Whisks" />
   <title>Whiskers & Whisks</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=1.34.0" />
 </head>
 <body>
-  <main id="app" aria-live="polite">
+  <main id="app">
     <section class="screen active" id="bakery-screen">
       <header class="topbar">
         <button class="icon-btn" id="sound-btn" aria-label="Toggle sound">♪</button>
@@ -63,6 +64,11 @@
           <button class="primary-btn" id="bake-btn">Bake something</button>
         </div>
       </div>
+      <section class="home-dashboard" aria-label="Bakery at a glance">
+        <div class="home-greeting"><span class="home-greeting-icon">✦</span><div><strong id="home-cat-name">Your little bakery</strong><small id="home-bakery-subtitle">A fresh day for something cozy</small></div></div>
+        <div class="home-metrics"><div><strong id="home-bakes">0</strong><small>treats made</small></div><div><strong id="home-friends">0</strong><small>cat friends</small></div><div><strong id="home-badges">0</strong><small>badges earned</small></div></div>
+        <div class="home-next"><span>UP NEXT</span><strong id="home-next-title">Your first bake</strong><small id="home-next-description">Make a warm treat to get started.</small><div class="home-next-track"><div id="home-next-progress"></div></div></div>
+      </section>
 
       <nav class="bottom-nav" aria-label="Game navigation">
         <button class="nav-btn active" data-screen="bakery-screen"><span>🏠</span>Bakery</button>
@@ -245,6 +251,7 @@
           <div><span>👑👑👑</span><strong>×50</strong></div>
         </div>
         <p class="slot-note">Any matching pair returns your bet.</p>
+        <div class="mode-milestones" id="slots-lifetime" aria-live="off"><span>🎰 <strong id="slots-played-mini">0</strong> spins</span><span>✨ <strong id="slots-won-mini">0</strong> wins</span></div>
       </div>
 
       <nav class="bottom-nav">
@@ -371,6 +378,7 @@
               <label class="fur-custom" title="Custom fur color"><span>+</span><input id="fur-color-input" type="color" value="#c58f62" aria-label="Custom fur color" /></label>
             </div>
           </div>
+          <div class="mode-milestones relax-milestones"><span>🐾 <strong id="relax-pets-mini">0</strong> pets</span><span>💤 <strong id="relax-time-mini">0s</strong> together</span></div>
         </div>
       </div>
 
@@ -423,6 +431,7 @@
             <button class="crow-action" id="crow-shiny-btn">Ask about shinies</button>
             <button class="crow-action dance-action" id="crow-dance-btn">Dance</button>
           </div>
+          <div class="mode-milestones"><span>🍞 <strong id="crow-given-mini">0</strong> crumbs</span><span>💎 <strong id="crow-received-mini">0</strong> shinies</span><span>🪩 <strong id="crow-parties-mini">0</strong> dances</span></div>
           <small>Tap William. Mostly jokes. Occasionally, statistics.</small>
         </div>
       </div>
@@ -464,7 +473,22 @@
       </section>
       <section class="achievements-records" aria-label="Achievements">
         <div class="achievements-heading"><h3>Achievements</h3><strong id="achievement-count">0 / 0</strong></div>
+        <div class="achievement-meta"><div class="achievement-summary-track"><div id="achievement-summary-fill"></div></div><span id="achievement-next-label">Your next little milestone is waiting.</span></div>
+        <div class="achievement-filters" role="group" aria-label="Filter achievements">
+          <button type="button" class="achievement-filter active" data-ach-filter="all">All</button>
+          <button type="button" class="achievement-filter" data-ach-filter="unlocked">Unlocked</button>
+          <button type="button" class="achievement-filter" data-ach-filter="progress">In progress</button>
+        </div>
+        <label class="achievement-category-select-label" for="achievement-category-select">Category
+          <select id="achievement-category-select"><option value="all">All activities</option></select>
+        </label>
         <div id="achievement-list" class="achievement-list"></div>
+      </section>
+      <section class="save-tools" aria-label="Save backup tools">
+        <div class="save-tools-heading"><div><strong>Your bakery, safely kept</strong><small>Back up your progress before switching devices or browsers.</small></div><span>♡</span></div>
+        <div class="save-tools-actions"><button type="button" id="export-save-btn">↧ Export save</button><button type="button" id="import-save-btn">↥ Import save</button><button type="button" id="restore-backup-btn" class="restore-backup-btn">↺ Restore safety backup</button></div>
+        <input id="import-save-file" type="file" accept="application/json,.json" hidden aria-label="Choose save file to restore">
+        <p class="save-tools-note">Progress stays in this browser unless you export it. Imports replace the current save only after confirmation; a local backup is kept first.</p>
       </section>
       <div class="memory-list" id="memory-list"></div>
       <nav class="bottom-nav">
@@ -478,8 +502,8 @@
       </nav>
     </section>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   </main>
-  <script src="game.js"></script>
+  <script src="game.js?v=1.34.0"></script>
 </body>
 </html>
